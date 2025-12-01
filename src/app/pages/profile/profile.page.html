@@ -1,0 +1,73 @@
+<div class="background-image"></div>
+
+<ion-content fullscreen *ngIf="usuario">
+
+  <div class="main-container-profile">
+
+    <section class="header-profile-edit-container">
+      <h1 class="title-section">EDITAR PERFIL</h1>
+    </section>
+
+    <section class="profile-section-container">
+      <div class="welcome-section-container">
+        <p>Hola de nuevo!</p>
+        <div [formGroup]="credentials">
+          <h1 *ngIf="!isEditing">{{ credentials.get('name')?.value | uppercase }}</h1>
+          <ion-textarea class="name-input" *ngIf="isEditing" formControlName="name" placeholder="Nombres Completos"
+            (ionInput)="onlyCharacteres($event)" autoGrow="true">
+          </ion-textarea>
+        </div>
+      </div>
+      
+      <div class="profile-photo-container"
+        [ngStyle]="{'background-image': selectedAvatar ? 'url(' + selectedAvatar + ')' : 'url(/assets/img/default-avatar.png)'}">
+        <button class="edit-avatar-btn" *ngIf="isEditing" (click)="openAvatarSelector()">
+          <ion-icon name="create-outline"></ion-icon>
+        </button>
+      </div>
+
+    </section>
+
+    <section class="profile-inputs-container">
+      <form [formGroup]="credentials">
+        <div class="inputs-container">
+          <p>Correo:</p>
+          <ion-input [readonly]="true" formControlName="email" type="email" class="disabled-input"></ion-input>
+          
+          <p>Dirección:</p>
+          <ion-input formControlName="address" [readonly]="!isEditing" (ionInput)="onlyAlphanumeric($event)" type="text"></ion-input>
+          
+          <p>Teléfono:</p>
+          <ion-input formControlName="phone" [readonly]="!isEditing" (ionInput)="onlyNumbers($event)" type="tel"></ion-input>
+        </div>
+
+        <section class="btn-container">
+          <ion-button class="save-btn" (click)="isEditing && saveChangesEdit()" *ngIf="isEditing">
+            Guardar
+          </ion-button>
+          
+          <div class="second-row-btn">
+            <ion-button class="edit-btn" (click)="editProfile()" *ngIf="!isEditing">Editar</ion-button>
+            <ion-button class="cancel-btn" *ngIf="isEditing" (click)="cancelEdit()">Cancelar</ion-button>
+            <ion-button class="logout-btn" (click)="logout()">Salir</ion-button>
+          </div>
+        </section>
+
+      </form>
+    </section>
+
+  </div>
+</ion-content>
+
+<div class="custom-avatar-modal" *ngIf="showAvatarModal">
+  <div class="modal-content">
+    <h2 class="text-modal">ELIJE TU AVATAR</h2>
+    <p>Elije el avatar que más te guste!</p>
+    <div class="avatar-grid">
+      <img *ngFor="let url of avatarUrls" [src]="url" (click)="confirmAvatarSelection(url)" />
+    </div>
+    <ion-button class="edit-avatar-btn" (click)="closeAvatarSelector()">SALIR</ion-button>
+  </div>
+</div>
+
+<app-navbar></app-navbar>

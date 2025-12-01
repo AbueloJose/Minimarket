@@ -1,0 +1,36 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="warning">
+    <ion-title style="font-weight: 900; color: #8d2516;">ESTADO DE TU POLLO</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="estado-content">
+  <section class="estado-container">
+    
+    <div class="header-image">
+      <img src="/assets/img/delivery-chicken.svg" onerror="this.src='https://ionicframework.com/docs/img/demos/card-media.png'" alt="Estado del pedido">
+    </div>
+
+    <div class="estado" *ngIf="pedido">
+      <div *ngFor="let est of estados; let i = index" [ngClass]="{
+          'activo': pedido.estado === est,
+          'completado': estados.indexOf(pedido.estado) > i
+        }">
+        
+        <ion-icon [name]="getStatusIcon(est)"></ion-icon>
+        {{ est }}
+      </div>
+    </div>
+
+    <div *ngIf="!pedido" style="text-align: center; margin-top: 20px;">
+      <ion-spinner name="dots"></ion-spinner>
+      <p>Buscando pedido...</p>
+    </div>
+
+    <section class="boton-container">
+      <ion-button expand="block" (click)="regresarHome()" class="back-button" shape="round">
+        Regresar al inicio
+      </ion-button>
+    </section>
+  </section>
+</ion-content>

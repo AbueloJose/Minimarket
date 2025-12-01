@@ -1,0 +1,84 @@
+<div class="background-image"></div>
+
+<ion-content fullscreen>
+  <div class="main-container">
+    <div class="image-container">
+      <img src="/assets/img/image-logo-without-bg.svg" onerror="this.src='https://ionicframework.com/docs/img/demos/card-media.png'" alt="Logo" />
+    </div>
+
+    <div class="text-welcome-register">
+      <p class="register-text">REGISTRARSE</p>
+      <p class="desc-register-text">Rellena tus datos para que puedas acceder</p>
+    </div>
+
+    <form [formGroup]="credentials">
+      <div class="inputs-container">
+        
+        <ion-input formControlName="name" type="text" placeholder="Nombres" maxlength="50"
+          (input)="filterTextOnly($event, 'name')"
+          [class.error-input]="credentials.get('name')?.invalid && credentials.get('name')?.touched">
+        </ion-input>
+        <div class="error-message" *ngIf="credentials.get('name')?.invalid && credentials.get('name')?.touched">
+          <span *ngIf="credentials.get('name')?.errors?.['required']">El nombre es requerido</span>
+          <span *ngIf="credentials.get('name')?.errors?.['textOnly']">Solo letras y espacios</span>
+        </div>
+
+        <ion-input formControlName="lastname" type="text" placeholder="Apellidos" maxlength="50"
+          (input)="filterTextOnly($event, 'lastname')"
+          [class.error-input]="credentials.get('lastname')?.invalid && credentials.get('lastname')?.touched">
+        </ion-input>
+        <div class="error-message" *ngIf="credentials.get('lastname')?.invalid && credentials.get('lastname')?.touched">
+          <span *ngIf="credentials.get('lastname')?.errors?.['required']">El apellido es requerido</span>
+        </div>
+
+        <ion-input formControlName="email" type="email" placeholder="Correo electrónico" maxlength="100"
+          [class.error-input]="credentials.get('email')?.invalid && credentials.get('email')?.touched">
+        </ion-input>
+        <div class="error-message" *ngIf="credentials.get('email')?.invalid && credentials.get('email')?.touched">
+          <span *ngIf="credentials.get('email')?.errors?.['required']">Correo requerido</span>
+          <span *ngIf="credentials.get('email')?.errors?.['email']">Formato inválido</span>
+        </div>
+
+        <ion-input formControlName="address" type="text" placeholder="Dirección" maxlength="200"
+          (input)="filterAddress($event)"
+          [class.error-input]="credentials.get('address')?.invalid && credentials.get('address')?.touched">
+        </ion-input>
+        <div class="error-message" *ngIf="credentials.get('address')?.invalid && credentials.get('address')?.touched">
+          <span *ngIf="credentials.get('address')?.errors?.['required']">Dirección requerida</span>
+        </div>
+
+        <ion-input formControlName="phone" type="tel" placeholder="Teléfono (9 dígitos)" maxlength="9"
+          (input)="filterPhoneOnly($event)"
+          [class.error-input]="credentials.get('phone')?.invalid && credentials.get('phone')?.touched">
+        </ion-input>
+        <div class="error-message" *ngIf="credentials.get('phone')?.invalid && credentials.get('phone')?.touched">
+          <span *ngIf="credentials.get('phone')?.errors?.['required']">Teléfono requerido</span>
+          <span *ngIf="credentials.get('phone')?.errors?.['invalidPhone']">Deben ser 9 números</span>
+        </div>
+
+        <ion-input formControlName="password" type="password" placeholder="Contraseña (mín 6 car.)" maxlength="50"
+          (input)="filterPassword($event)"
+          [class.error-input]="credentials.get('password')?.invalid && credentials.get('password')?.touched">
+        </ion-input>
+        
+        <ion-input formControlName="passwordConfirmation" type="password" placeholder="Confirmar contraseña" maxlength="50"
+          (input)="filterPasswordConfirmation($event)"
+          [class.error-input]="credentials.get('passwordConfirmation')?.invalid && credentials.get('passwordConfirmation')?.touched">
+        </ion-input>
+        
+        <div class="error-message" *ngIf="credentials.errors?.['mismatch'] && credentials.get('passwordConfirmation')?.touched">
+          <span>Las contraseñas no coinciden</span>
+        </div>
+      </div>
+
+      <div class="button-container">
+        <ion-button (click)="createAccount()" class="login-button" [disabled]="credentials.invalid">
+          REGISTRARSE
+        </ion-button>
+        <ion-label style="margin-top: 15px;">
+          ¿Ya tienes una cuenta? <span (click)="goToLogin()">Iniciar sesión</span>
+        </ion-label>
+      </div>
+    </form>
+  </div>
+</ion-content>

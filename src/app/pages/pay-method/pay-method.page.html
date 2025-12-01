@@ -1,0 +1,83 @@
+<div class="background-image"></div>
+
+<ion-content fullscreen>
+  <section class="main-container-pay">
+    <button class="btn-back" (click)="goBack()">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+      <p>Regresar</p>
+    </button>
+
+    <section class="header-pay-section">
+      <img src="/assets/img/money-cash-chicken.svg" onerror="this.src='https://ionicframework.com/docs/img/demos/card-media.png'" alt="Money Chicken" />
+    </section>
+
+    <section class="user-address">
+      <h1>Dirección de Entrega:</h1>
+      <p *ngIf="usuario">{{usuario.direccion || 'Sin dirección registrada'}}</p>
+    </section>
+
+    <section class="header-subtitle-section">
+      <h1>Agregar Tarjeta:</h1>
+      <button class="add-card-btn" (click)="abrirModalAgregarTarjeta()">
+        <ion-icon name="add-outline"></ion-icon>
+      </button>
+    </section>
+
+
+    <section class="payment-options">
+
+      <div class="payment-method" (click)="metodoSeleccionado = 'efectivo'">
+        <ion-icon name="cash-outline" class="method-icon" style="font-size: 40px; color: green;"></ion-icon>
+        <span class="method-label">Efectivo</span>
+        
+        <span class="custom-radio" [class.selected]="metodoSeleccionado === 'efectivo'"></span>
+      </div>
+
+      <div class="payment-method" (click)="metodoSeleccionado = 'yape'">
+        <ion-icon name="qr-code-outline" class="method-icon" style="font-size: 40px; color: purple;"></ion-icon>
+        <span class="method-label">Yape / Plin</span>
+        
+        <span class="custom-radio" [class.selected]="metodoSeleccionado === 'yape'"></span>
+      </div>
+
+      <div *ngFor="let t of tarjetas" class="payment-method" (click)="metodoSeleccionado = t.id">
+        <ion-icon name="card-outline" class="method-icon" style="font-size: 40px; color: blue;"></ion-icon>
+        <span class="method-label">TARJETA - {{ t.numero_mascara.slice(-4) }}</span>
+
+        <button class="delete-btn" (click)="confirmarEliminarTarjeta(t.id); $event.stopPropagation()">
+          <ion-icon name="trash-outline"></ion-icon>
+        </button>
+
+        <span class="custom-radio" [class.selected]="metodoSeleccionado === t.id"></span>
+      </div>
+
+    </section>
+
+
+    <section class="pay-summary">
+      <div class="summary-left">
+        <span class="summary-title">Total a pagar:</span>
+        <span class="summary-amount">S/ {{ total | number:'1.2-2' }}</span>
+      </div>
+      <div class="summary-right">
+        <button class="checkout-btn" (click)="realizarPedido()">Realizar Pedido</button>
+      </div>
+    </section>
+  </section>
+
+  <div class="modal-overlay" *ngIf="showModal">
+    <div class="modal-content">
+      <img src="/assets/img/card-chicken.png" onerror="this.src='https://ionicframework.com/docs/img/demos/card-media.png'" alt="Agregar tarjeta" class="modal-image" />
+      <h2>AGREGA TU TARJETA</h2>
+
+      <p style="color: #666; font-size: 0.9em; margin-bottom: 20px;">
+        (Simulación: Aquí irían los campos de Stripe)
+      </p>
+
+      <div class="modal-actions">
+        <button class="save-btn-target" (click)="guardarTarjeta()">Guardar Tarjeta Falsa</button>
+        <button (click)="cancelarAgregarTarjeta()" style="background: #ccc; color: #333; margin-top: 10px;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</ion-content>

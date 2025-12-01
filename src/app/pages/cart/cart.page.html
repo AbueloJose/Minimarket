@@ -1,0 +1,38 @@
+<div class="background-image"></div>
+
+<ion-content fullscreen *ngIf="usuario">
+  <div class="main-container-profile">
+    
+    <app-header-profile introText="¡Tus pedidos pendientes!"></app-header-profile>
+    
+    <div class="logo-section-container">
+      <div class="logo-container">
+        <img src="https://ionicframework.com/docs/img/demos/card-media.png" alt="Logo Carrito" style="border-radius: 50%;" />
+      </div>
+      <p>EL CARRITO</p>
+      <p>Aquí encontrarás todos los productos que agregaste!</p>
+    </div>
+
+    <div class="products-container" *ngIf="productos.length > 0; else emptyCart">
+      <app-product-card 
+        *ngFor="let producto of productos" 
+        [id]="producto.id" 
+        [name]="producto.nombre"
+        [price]="producto.precio" 
+        [imageUrl]="producto.imagen_url">
+      </app-product-card>
+    </div>
+
+    <ng-template #emptyCart>
+      <div style="text-align: center; margin-top: 20px; color: #666;">
+        <p>Tu carrito está vacío 😢</p>
+        <ion-button routerLink="/home" color="warning" shape="round">
+          Ir a comprar
+        </ion-button>
+      </div>
+    </ng-template>
+
+  </div>
+</ion-content>
+
+<app-navbar></app-navbar>

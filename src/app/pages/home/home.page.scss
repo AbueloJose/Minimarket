@@ -1,0 +1,127 @@
+$primary-yellow: #fab222;
+$primary-green: #417533;
+$secondary-green: #3b6630;
+$primary-red: #8d2516;
+$hover-yellow: #e4a21d;
+$color-dark: #120000;
+$white: #ffffff;
+$light-gray: #737373;
+$text-dark: #151515;
+$font-family: "Inter", sans-serif;
+
+@mixin cover-background($url) {
+  background: url($url) no-repeat center center/cover;
+}
+
+.background-image {
+  // @include cover-background("/assets/img/background-food-vector.svg");
+  background-color: #f4f4f4; // Fondo respaldo
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+}
+
+ion-content {
+  position: relative;
+  z-index: 1;
+  --background: transparent;
+  display: block;
+  width: 100%;
+}
+
+ion-card {
+  margin: 0;
+}
+
+button {
+  border: 3px solid $color-dark;
+  background: #{$primary-yellow};
+  border-radius: 40px;
+  width: 35%;
+  padding: 10px 0px;
+  color: $primary-red;
+  font-size: 20px;
+  font-family: $font-family;
+  font-weight: 700;
+}
+
+button:hover {
+  background: #{$primary-red};
+  color: $primary-yellow;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  ion-icon { color: $primary-yellow; }
+}
+
+.main-container-profile {
+  display: block;
+  flex-direction: column;
+  width: 100%;
+  height: 90%;
+  padding: 3.3em 1.3em 0em 1.3em;
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding-bottom: 100px; /* Espacio para el navbar */
+}
+
+.carrousel-container {
+  margin: 1em 0em;
+  border: 6px solid $text-dark;
+  border-radius: 40px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 10em;
+  background-color: #d9d9d9;
+
+  .carrousel-image {
+    width: 110%;
+    height: 110%;
+    object-fit: cover;
+    object-position: center;
+  }
+}
+
+.category-btn-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin: 1.5em 0em;
+}
+.category-btn.active,
+.category-btn.active:hover {
+  background-color: #8d2516;
+  color: $primary-yellow;
+}
+
+.category-btn {
+  background-color: #fab222;
+  border: 3px solid $color-dark;
+  padding: 10px 10px;
+  border-radius: 30px;
+  font-weight: bold;
+  color: $primary-red;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.category-btn:not(.active):hover {
+  background-color: #8d2516;
+  color: $primary-yellow;
+}
+
+.products-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  background-color: transparent;
+  border-radius: 40px;
+  width: 100%;
+  padding-bottom: 70px;
+  box-sizing: border-box;
+}

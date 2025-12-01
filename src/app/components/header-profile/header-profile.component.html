@@ -1,0 +1,14 @@
+<div class="header-profile-container">
+  <div class="profile-container">
+    <div class="profile-icon"
+      [ngStyle]="{'background-image': 'url(' + (selectedAvatar || 'https://ionicframework.com/docs/img/demos/avatar.svg') + ')'}">
+    </div>
+    <div class="profile-text">
+      <p class="intro">{{ introText }}</p>
+      <p class="username">{{ username | uppercase }}</p>
+    </div>
+  </div>
+  <button class="notifications-btn" (click)="abrirSidebarEstadoPedido()">
+    <ion-icon name="megaphone-outline"></ion-icon>
+  </button>
+</div>

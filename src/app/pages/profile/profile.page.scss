@@ -1,0 +1,344 @@
+$primary-yellow: #fab222;
+$primary-green: #417533;
+$secondary-green: #3b6630;
+$primary-red: #8d2516;
+$hover-red: #63170b;
+$hover-yellow: #e4a21d;
+$color-dark: #120000;
+$white: #ffffff;
+$white-color: #f4f4f4;
+$light-gray: #737373;
+$text-dark: #151515;
+$font-family: "Inter", sans-serif;
+
+p {
+  margin: 0;
+  font-weight: 500;
+  font-size: 15px;
+  font-family: $font-family;
+}
+
+@mixin cover-background($url) {
+  background: url($url) no-repeat center center/cover;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.background-image {
+  // @include cover-background("/assets/img/background-food-vector.svg");
+  background-color: #f4f4f4;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+}
+
+ion-content {
+  position: relative;
+  z-index: 1;
+  --background: transparent;
+  display: block;
+  width: 100%;
+}
+
+.main-container-profile {
+  flex-direction: column;
+  width: 100%;
+  height: 90%;
+  display: block;
+  padding: 3.3em 1.3em 0em 1.3em;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.header-profile-edit-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: column;
+  background-color: $primary-red;
+  border-radius: 10px;
+  padding: 10px 20px;
+  border: 3px solid $color-dark;
+}
+
+.title-section {
+  font-family: $font-family;
+  font-weight: 900;
+  font-size: 2em;
+  color: $primary-yellow;
+}
+
+.profile-section-container {
+  display: flex;
+  padding: 10px;
+  flex-direction: row;
+  padding-top: 20px;
+  gap: 10px;
+  width: 100%;
+  font-family: $font-family;
+  min-height: 10em;
+}
+
+.welcome-section-container {
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  max-width: 60%;
+  min-width: 60%;
+  background-color: transparent;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.profile-photo-container {
+  width: 40%;
+  border: 3px solid $color-dark;
+  border-radius: 40px;
+  background-color: #d9d9d9;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  aspect-ratio: 1/1;
+
+  .edit-avatar-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ion-icon {
+      color: $white;
+      font-size: 20px;
+    }
+  }
+}
+
+.profile-section-container p,
+h1 {
+  margin: 0;
+}
+.profile-section-container h1,
+ion-input.name-input {
+  max-width: 100%;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  border: none;
+  padding-top: 10px;
+  text-align: left;
+  font-family: $font-family;
+  font-weight: 900;
+}
+
+.profile-inputs-container {
+  width: 100%;
+  margin-top: 10px;
+  padding: 25px;
+  height: 30em !important;
+  border-radius: 40px;
+  background-color: #e0e0e0;
+  --keyboard-offset: 0px;
+
+  @media (min-width: 1024px) {
+    height: 85% !important;
+  }
+}
+
+.inputs-container {
+  z-index: 10;
+  width: 100%;
+  gap: 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+ion-input {
+  display: inline;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  font-size: 17px;
+  background-color: $white-color;
+  text-align: center;
+  height: 10px;
+  border: 3px solid #{$color-dark};
+  border-radius: 40px;
+  margin-bottom: 15px;
+  margin-top: 2px;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
+.btn-container {
+  width: 100%;
+  gap: 10px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+
+ion-button {
+  width: 100%;
+}
+
+ion-textarea.name-input {
+  width: 100%;
+  max-width: 100%;
+  font-size: 1.3em;
+  height: auto;
+  font-family: $font-family;
+  font-weight: 700;
+  color: #3c3c3c;
+  border: none;
+  padding-bottom: 0px;
+  border-bottom: 2px solid #3c3c3c;
+}
+
+ion-button::part(native) {
+  padding: 10px 10px;
+  width: 100%;
+  --border-radius: 10px;
+  font-size: 1rem;
+  font-weight: normal;
+  font-family: $font-family;
+  transition: var(--transition);
+}
+
+ion-button.save-btn::part(native) {
+  background: $primary-red;
+  color: $primary-yellow;
+  font-weight: 700;
+  border: 3px solid #{$color-dark};
+  font-size: 20px;
+  font-family: $font-family;
+  border-radius: 40px;
+}
+
+ion-button.edit-btn::part(native) {
+  background: $primary-yellow;
+  color: $primary-red;
+  font-family: $font-family;
+  border: 3px solid #{$color-dark};
+  font-size: 20px;
+  font-weight: 700;
+  border-radius: 40px;
+}
+
+ion-button.cancel-btn::part(native) {
+  background: $primary-red;
+  color: #e4e4e4;
+  border: 3px solid #820000;
+  font-size: 20px;
+  font-family: $font-family;
+  font-weight: 700;
+  border-radius: 40px;
+}
+
+ion-button.logout-btn::part(native) {
+  background: #cacaca;
+  color: #646464;
+  border: 3px solid #cacaca;
+  font-size: 20px;
+  font-weight: 600;
+  border-radius: 40px;
+}
+
+.second-row-btn {
+  gap: 10px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.custom-avatar-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+
+  .modal-content {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    width: 80%;
+    max-height: 80%;
+    overflow-y: auto;
+
+    h2 {
+      text-align: center;
+      font-family: $font-family;
+      font-weight: 900;
+      color: $hover-yellow;
+    }
+
+    p {
+      text-align: center;
+      font-family: $font-family;
+      font-weight: 400;
+      color: $color-dark;
+      margin-bottom: 20px;
+    }
+
+    .avatar-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+
+      img {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        cursor: pointer;
+        object-fit: cover;
+        border: 2px solid transparent;
+      }
+
+      img:hover {
+        border-color: #3880ff;
+      }
+    }
+
+    ion-button.edit-avatar-btn::part(native) {
+      padding: 3px !important;
+      margin: 0 auto;
+      background: $primary-red;
+      margin-top: 30px;
+      width: 50%;
+      color: #e4e4e4;
+      border: 3px solid $color-dark;
+      font-size: 20px;
+      font-family: $font-family;
+      font-weight: 700;
+      border-radius: 10px;
+    }
+  }
+
+  .text-modal {
+    background-color: $primary-red;
+    border-radius: 10px;
+    padding: 10px;
+    border: 3px solid $color-dark;
+  }
+}
