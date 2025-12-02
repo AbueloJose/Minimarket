@@ -6,46 +6,37 @@ import { SupabaseService } from '../../services/supabase.service';
   selector: 'app-favorite',
   templateUrl: './favorite.page.html',
   styleUrls: ['./favorite.page.scss'],
-  standalone: false // <--- Modo Clásico
+  standalone: false
 })
 export class FavoritePage implements OnInit {
   
-  categorySelected: string = 'all';
-  usuario = true; // Temporal para ver el HTML
-  productos: any[] = [];          // Todos los favoritos
-  productosFiltrados: any[] = []; // Los que se muestran
+  usuario: any = null;
+  productosFiltrados: any[] = [];
+  loading: boolean = true;
 
   constructor(
     private supabase: SupabaseService, 
     private router: Router
   ) {}
 
-  async ngOnInit() {
-    await this.cargarFavoritos();
+  ngOnInit() {}
+
+  async ionViewWillEnter() {
+    await this.cargarDatos();
   }
 
-  async cargarFavoritos() {
-    console.log('Cargando favoritos...');
-    this.productos = await this.supabase.getFavoritos();
+  async cargarDatos() {
+    this.loading = true;
+    const user = await this.supabase.getCurrentUser();
     
-    // Al inicio mostramos todo
-    this.productosFiltrados = this.productos;
-  }
-
-  // Filtro simple por texto (igual que en Home)
-  filtrarProductos() {
-    if (this.categorySelected === 'menu') {
-      this.productosFiltrados = this.productos.filter(p => p.categoria === 'Alimentos' || p.categoria === 'Comida');
-    } else if (this.categorySelected === 'bebidas') {
-      this.productosFiltrados = this.productos.filter(p => p.categoria === 'Bebidas');
+    if (user) {
+      this.usuario = user;
+      // Esto llena la variable que usa el HTML nuevo
+      this.productosFiltrados = await this.supabase.getFavoritos();
     } else {
-      this.productosFiltrados = this.productos;
+      this.usuario = null;
+      this.productosFiltrados = [];
     }
-  }
-
-  // Esta función la llama el HTML cuando tocas los botones (si los tuvieras)
-  seleccionarCategoria(cat: string) {
-    this.categorySelected = cat;
-    this.filtrarProductos();
+    this.loading = false;
   }
 }

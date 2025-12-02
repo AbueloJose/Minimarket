@@ -7,7 +7,7 @@ import { SupabaseService } from '../../services/supabase.service';
   selector: 'app-pedido-cargando',
   templateUrl: './pedido-cargando.page.html',
   styleUrls: ['./pedido-cargando.page.scss'],
-  standalone: false // <--- Modo Clásico
+  standalone: false
 })
 export class PedidoCargandoPage implements OnInit {
   
@@ -21,7 +21,6 @@ export class PedidoCargandoPage implements OnInit {
   ) {}
 
   async ngOnInit() {
-    // 1. Obtener datos del router
     const nav = this.router.getCurrentNavigation();
     const state = nav?.extras.state as { total: number; cartItems: any[] };
 
@@ -29,7 +28,6 @@ export class PedidoCargandoPage implements OnInit {
       this.total = state.total;
       this.cartItems = state.cartItems;
     } else {
-      // Si entras directo sin datos, te manda al home
       this.router.navigate(['/home']);
       return;
     }
@@ -38,7 +36,6 @@ export class PedidoCargandoPage implements OnInit {
   }
 
   async procesarPedido() {
-    // 2. Obtener Usuario
     const user = await this.supabase.getCurrentUser();
     if (!user) {
       await this.mostrarAlerta('Debes iniciar sesión para pedir');
@@ -46,11 +43,11 @@ export class PedidoCargandoPage implements OnInit {
       return;
     }
 
-    // 3. Crear el Pedido (Cabecera)
+    // 1. Crear Pedido
     const nuevoPedido = {
       usuario_id: user.id,
       total: this.total,
-      estado: 'Pendiente', // Estado inicial
+      estado: 'Pendiente',
       fecha: new Date()
     };
 
@@ -62,58 +59,53 @@ export class PedidoCargandoPage implements OnInit {
       return;
     }
 
-    // 4. Guardar los detalles (Cada plato)
+    // 2. Guardar Detalles
     for (const item of this.cartItems) {
       const detalle = {
         pedido_id: pedidoCreado.id,
-        producto_id: item.id || item.producto_id, // Depende de cómo venga el objeto
+        producto_id: item.id || item.producto_id,
         cantidad: item.cantidad,
         precio_unit: item.precio
       };
-      
       await this.supabase.guardarDetallePedido(detalle);
     }
 
-    // 5. Borrar carrito y limpiar variables
-    await this.supabase.vaciarCarrito(); // O borrar solo los items del usuario
+    // 3. VACIAR CARRITO (Ahora pasamos el ID)
+    await this.supabase.vaciarCarrito(user.id);
     this.cartItems = [];
     this.total = 0;
 
-    // 6. Guardar ID para la siguiente página
+    // 4. Guardar ID y Simular
     localStorage.setItem('pedidoActualId', pedidoCreado.id);
-
-    // 7. Iniciar Simulación en segundo plano
     this.simularEstados(pedidoCreado.id);
 
-    // 8. Redirigir a la pantalla de estado
     setTimeout(() => {
       this.router.navigate(['/pedido-estado']);
-    }, 2000); // 2 segundos de "Cargando..."
+    }, 2000);
+    // 5. BORRAR CARRITO
+    console.log('Llamando a vaciarCarrito...');
+    const borrado = await this.supabase.vaciarCarrito(user.id);
+    
+    if (borrado) {
+        console.log('Carrito borrado correctamente en la interfaz');
+        this.cartItems = [];
+        this.total = 0;
+    } else {
+        console.error('ALERTA: El carrito no se borró en la BD');
+    }
   }
 
-  // --- LÓGICA DE SIMULACIÓN ---
   simularEstados(pedidoId: string) {
     const estados = [
-      'Confirmado',
-      'En preparación',
-      'Listo para enviar',
-      'En camino',
-      'Espera de entregar'
+      'Confirmado', 'En preparación', 'Listo para enviar', 
+      'En camino', 'Espera de entregar'
     ];
-
     let index = 0;
-    
-    // Cambia de estado cada 5 segundos
     const interval = setInterval(async () => {
       const estadoActual = estados[index];
-      console.log(`Simulando estado: ${estadoActual}`);
-
       await this.supabase.actualizarEstadoPedido(pedidoId, estadoActual);
-
       index++;
-      if (index >= estados.length) {
-        clearInterval(interval); // Detener al final
-      }
+      if (index >= estados.length) clearInterval(interval);
     }, 5000);
   }
 

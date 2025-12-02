@@ -1,21 +1,15 @@
-<div class="product-card-container" (click)="goToDetail()">
-  
-  <div class="image-product-container">
-    <img [src]="imageUrl || 'https://ionicframework.com/docs/img/demos/card-media.png'" alt="Producto">
-  </div>
-
-  <div class="text-product-container">
-    {{ name }}
-  </div>
-
-  <div class="product-subcontainer">
-    <div class="price-container">
-      S/ {{ price | number:'1.2-2' }}
-    </div>
+<div class="product-card" (click)="goToProductView()"> 
     
-    <div class="add-product" (click)="add($event)">
-      <ion-icon name="add-outline"></ion-icon>
+    <div class="product-image">
+        <img [src]="imageUrl || 'placeholder.png'" alt="{{ name }}">
     </div>
-  </div>
 
+    <div class="product-info-container">
+        
+        <div class="product-info">
+            <h3 class="product-title">{{ name }}</h3>
+            <span class="product-price">S/ {{ price | number:'1.2-2' }}</span>
+        </div>
+
+        </div>
 </div>

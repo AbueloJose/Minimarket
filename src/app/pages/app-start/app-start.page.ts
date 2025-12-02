@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
   selector: 'app-app-start',
   templateUrl: './app-start.page.html',
   styleUrls: ['./app-start.page.scss'],
-  standalone: false // <--- Modo Clásico
+  standalone: false
 })
 export class AppStartPage implements OnInit {
 

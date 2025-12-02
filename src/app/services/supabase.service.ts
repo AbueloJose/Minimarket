@@ -13,29 +13,24 @@ export class SupabaseService {
   }
 
   // ==========================================
-  // 1. AUTENTICACIÓN (LOGIN / REGISTER)
+  // 1. AUTENTICACIÓN
   // ==========================================
 
   async signIn(email: string, password: string) {
-    return await this.supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    return await this.supabase.auth.signInWithPassword({ email, password });
   }
 
   async signUp(email: string, password: string, data: any) {
     return await this.supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: data // Aquí guardamos nombre, apellido, etc.
-      }
+      options: { data: data }
     });
   }
 
   async sendPasswordReset(email: string) {
     return await this.supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: 'http://localhost:8100/reset-password', 
+      redirectTo: 'http://localhost:8100/reset-password',
     });
   }
 
@@ -58,16 +53,8 @@ export class SupabaseService {
       .select('*')
       .eq('id', uid)
       .single();
-    
     if (error) return null;
     return data;
-  }
-
-  async updateUserProfile(uid: string, datos: any) {
-    return await this.supabase
-      .from('usuarios')
-      .update(datos)
-      .eq('id', uid);
   }
 
   // ==========================================
@@ -78,7 +65,6 @@ export class SupabaseService {
     const { data, error } = await this.supabase
       .from(tabla)
       .select('*');
-    
     if (error) {
       console.error(`Error cargando ${tabla}:`, error);
       return [];
@@ -94,16 +80,16 @@ export class SupabaseService {
       .single();
 
     if (error) {
-      console.error('Error buscando producto:', error);
+      console.error('Error buscando producto en Supabase:', error);
       return null;
     }
-    return data;
+    return data || null;
   }
 
   // ==========================================
-  // 4. CARRITO DE COMPRAS (CORREGIDO)
+  // 4. CARRITO DE COMPRAS
   // ==========================================
-
+  
   async getCarrito() {
     const { data, error } = await this.supabase
       .from('carrito')
@@ -125,47 +111,42 @@ export class SupabaseService {
     }));
   }
 
-  // --- VERSIÓN SEGURA PARA AGREGAR ---
   async agregarAlCarrito(usuario_id: string, producto_id: string) {
-    console.log('🛒 Intentando agregar:', { usuario_id, producto_id });
-
-    // 1. Buscamos si ya existe (sin .single() para evitar errores si está vacío)
-    const { data: existentes, error: buscarError } = await this.supabase
+    const { data: existentes } = await this.supabase
       .from('carrito')
       .select('*')
       .eq('usuario_id', usuario_id)
       .eq('producto_id', producto_id);
 
-    if (buscarError) {
-      console.error('❌ Error buscando en carrito:', buscarError.message);
-      return false;
-    }
-
     if (existentes && existentes.length > 0) {
-      // 2. Si existe, actualizamos cantidad
       const item = existentes[0];
-      const { error: updateError } = await this.supabase
+      const { error } = await this.supabase
         .from('carrito')
         .update({ cantidad: item.cantidad + 1 })
         .eq('id', item.id);
-
-      if (updateError) {
-        console.error('❌ Error actualizando cantidad:', updateError.message);
-        return false;
-      }
-      return true;
-
+      return !error;
     } else {
-      // 3. Si no existe, creamos nuevo
-      const { error: insertError } = await this.supabase
+      const { error } = await this.supabase
         .from('carrito')
         .insert({ usuario_id, producto_id, cantidad: 1 });
+      return !error;
+    }
+  }
 
-      if (insertError) {
-        console.error('❌ Error insertando producto:', insertError.message);
-        return false;
-      }
-      return true;
+  async toggleCart(usuario_id: string, producto_id: string) {
+    const { data } = await this.supabase
+      .from('carrito')
+      .select('*')
+      .eq('usuario_id', usuario_id)
+      .eq('producto_id', producto_id)
+      .maybeSingle();
+
+    if (data) {
+      await this.supabase.from('carrito').delete().eq('id', data.id);
+      return 'removed'; 
+    } else {
+      await this.supabase.from('carrito').insert({ usuario_id, producto_id, cantidad: 1 });
+      return 'added'; 
     }
   }
 
@@ -185,11 +166,11 @@ export class SupabaseService {
     return !error;
   }
 
-  async vaciarCarrito() {
+  async vaciarCarrito(usuario_id: string) {
     const { error } = await this.supabase
       .from('carrito')
       .delete()
-      .neq('id', 0); 
+      .eq('usuario_id', usuario_id); 
     return !error;
   }
 
@@ -204,12 +185,24 @@ export class SupabaseService {
         id,
         producto:productos ( * )
       `);
-
-    if (error) {
-      console.error('Error cargando favoritos:', error);
-      return [];
-    }
+    if (error) return [];
     return (data || []).map((item: any) => item.producto);
+  }
+
+  async toggleFavorite(usuario_id: string, producto_id: string) {
+    const { data } = await this.supabase
+      .from('favoritos')
+      .select('*')
+      .match({ usuario_id, producto_id })
+      .maybeSingle();
+
+    if (data) {
+      await this.supabase.from('favoritos').delete().eq('id', data.id);
+      return 'removed'; 
+    } else {
+      await this.supabase.from('favoritos').insert({ usuario_id, producto_id });
+      return 'added'; 
+    }
   }
 
   // ==========================================
@@ -221,20 +214,8 @@ export class SupabaseService {
       .from('tarjetas')
       .select('*')
       .eq('usuario_id', uid);
-    
-    if (error) {
-      console.error('Error cargando tarjetas:', error);
-      return [];
-    }
+    if (error) return [];
     return data || [];
-  }
-
-  async deleteTarjeta(id: string) {
-    const { error } = await this.supabase
-      .from('tarjetas')
-      .delete()
-      .eq('id', id);
-    return !error;
   }
 
   // ==========================================
@@ -247,26 +228,17 @@ export class SupabaseService {
       .insert(datosPedido)
       .select('id')
       .single();
-
-    if (error) {
-      console.error('Error creando pedido:', error);
-      return null;
-    }
+    if (error) { console.error('Error pedido:', error); return null; }
     return data;
   }
 
   async guardarDetallePedido(detalle: any) {
-    const { error } = await this.supabase
-      .from('detalle_pedidos')
-      .insert(detalle);
+    const { error } = await this.supabase.from('detalle_pedidos').insert(detalle);
     return !error;
   }
   
   async actualizarEstadoPedido(id: string, estado: string) {
-    const { error } = await this.supabase
-      .from('pedidos')
-      .update({ estado: estado })
-      .eq('id', id);
+    const { error } = await this.supabase.from('pedidos').update({ estado: estado }).eq('id', id);
     return !error;
   }
 
@@ -276,11 +248,7 @@ export class SupabaseService {
       .select('*')
       .eq('id', id)
       .single();
-
-    if (error) {
-      console.error('Error cargando pedido:', error);
-      return null;
-    }
+    if (error) return null;
     return data;
   }
 }

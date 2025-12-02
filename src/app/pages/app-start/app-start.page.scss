@@ -36,10 +36,8 @@ $font-family: "Inter", sans-serif;
   background-size: contain;
 }
 
-// Estilos aplicados
 .background-brown-image {
-  // @include cover-background("/assets/img/background-brown-image.svg");
-  background-color: #3e2723; // Color café de respaldo
+  background-color: #3e2723;
   @include fixed-fullscreen;
   z-index: -1;
 }
@@ -51,8 +49,7 @@ ion-content {
 }
 
 .image-container {
-  // @include image-container("/assets/img/image-logo-polleria.svg");
-  @include image-container("https://ionicframework.com/docs/img/demos/card-media.png"); // Placeholder
+  @include image-container("https://ionicframework.com/docs/img/demos/card-media.png"); 
   width: 312px;
   height: 312px;
   border-radius: 20px;

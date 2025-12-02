@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Output, OnInit, Input } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-// Importamos el sidebar para poder abrirlo
 import { SidebarPedidoComponent } from '../sidebar-pedido/sidebar-pedido.component';
 
 @Component({
@@ -22,10 +21,9 @@ export class HeaderProfileComponent implements OnInit {
   ngOnInit() {}
 
   async abrirSidebarEstadoPedido() {
-    // Creamos el Modal con el componente del Sidebar
     const modal = await this.modalController.create({
       component: SidebarPedidoComponent,
-      cssClass: 'sidebar-pedido-modal', // Clase transparente para ver el fondo
+      cssClass: 'sidebar-pedido-modal', 
       backdropDismiss: true
     });
 

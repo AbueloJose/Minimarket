@@ -1,35 +1,33 @@
 <div class="background-image"></div>
 
 <ion-content fullscreen *ngIf="usuario">
-
   <div class="main-container-profile">
-    <app-header-profile introText="¡Lo que más te gusta!"></app-header-profile>
+    
+    <app-header-profile introText="¡Tus guardados!"></app-header-profile>
     
     <div class="logo-section-container">
       <div class="logo-container">
-        <!-- Imagen temporal -->
         <img src="https://ionicframework.com/docs/img/demos/card-media.png" alt="Logo Favoritos" style="border-radius: 50%;" />
       </div>
       <p>FAVORITOS</p>
-      <p>¡Aquí encontrarás todos los productos que te encantaron!</p>
+      <p>Tu lista de deseos. ¡Añádelos al carrito cuando quieras!</p>
     </div>
 
-    <!-- Lista de Favoritos -->
-    <div class="products-container" *ngIf="productosFiltrados.length > 0; else emptyFavs">
-      <app-product-card *ngFor="let producto of productosFiltrados" 
-        [id]="producto.id" 
-        [name]="producto.nombre"
-        [price]="producto.precio" 
-        [imageUrl]="producto.imagen_url">
+    <div class="products-container" *ngIf="productosFiltrados && productosFiltrados.length > 0; else noFavorites">
+      <app-product-card 
+        *ngFor="let item of productosFiltrados" 
+        [id]="item.id" 
+        [name]="item.nombre"
+        [price]="item.precio" 
+        [imageUrl]="item.imagen_url">
       </app-product-card>
     </div>
 
-    <!-- Mensaje vacío -->
-    <ng-template #emptyFavs>
+    <ng-template #noFavorites>
       <div style="text-align: center; margin-top: 20px; color: #666;">
-        <p>Aún no tienes favoritos ❤️</p>
-        <ion-button routerLink="/home" color="danger" fill="outline" shape="round">
-          Explorar menú
+        <p>Aún no tienes favoritos 💔</p>
+        <ion-button routerLink="/home" color="warning" shape="round">
+          Explorar productos
         </ion-button>
       </div>
     </ng-template>

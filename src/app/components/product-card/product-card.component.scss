@@ -1,105 +1,87 @@
+/* Variables de ejemplo */
 $primary-yellow: #fab222;
-$primary-green: #417533;
-$secondary-green: #3b6630;
+$primary-red: #8d2516;
 $color-dark: #120000;
 $white: #ffffff;
 $font-family: "Inter", sans-serif;
 
-.product-card-container {
-  display: flex;
-  background-color: #f0ebeb;
-  height: 17em;
-  width: 100%;
-  border: 3px solid $color-dark;
-  border-radius: 40px;
-  padding: 15px 10px;
-  gap: 10px;
-  flex-direction: column;
-  position: relative; /* Necesario para el z-index */
-  cursor: pointer;
+.product-card {
+    background: $white;
+    border: 3px solid $color-dark;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+    overflow: hidden;
 }
 
-.image-product-container {
-  display: flex;
-  background-color: #d9d9d9;
-  height: 10em;
-  border-radius: 40px;
-  width: 100%;
-  overflow: hidden;
-  justify-content: center;
-  align-items: center;
-
-  img {
+.product-image {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+    height: 120px;
+    background: #f0f0f0;
+    
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 }
 
-.text-product-container {
-  display: flex;
-  padding: 10px;
-  line-height: 1.1;
-  text-align: center;
-  justify-content: center;
-  align-items: center;
-  font-family: $font-family;
-  font-size: 1.1rem;
-  color: $secondary-green;
-  font-weight: 900;
-  background-color: #e6e6e6;
-  height: 4em;
-  border-radius: 40px;
-  width: 100%;
+.product-info-container {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 15px;
 }
 
-.product-subcontainer {
-  display: flex;
-  gap: 5px;
-  height: 3em;
-  width: 100%;
-  align-items: center;
+.product-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+
+    .product-title {
+        font-weight: 700;
+        font-size: 16px;
+        color: $color-dark;
+        margin: 0;
+        max-width: 60%;
+    }
+
+    .product-price {
+        font-weight: 900;
+        font-size: 18px;
+        color: $primary-red;
+    }
 }
 
-.price-container {
-  display: flex;
-  background-color: #d9d9d9;
-  height: 100%;
-  padding: 5px;
-  align-items: center;
-  justify-content: center;
-  font-family: $font-family;
-  font-size: 18px;
-  font-weight: 900;
-  width: 65%;
-  border-radius: 30px;
-}
 
-/* ESTILOS DEL BOTÓN AGREGAR */
-.add-product {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: $primary-green;
-  border: 3px solid $color-dark;
-  border-radius: 40px;
-  font-size: 24px;
-  width: 35%;
-  height: 100%;
-  cursor: pointer;
-  z-index: 100; /* Asegura que esté por encima del contenedor */
-  transition: background-color 0.2s;
+/* SECCIÓN DE CONTROL DE CANTIDAD (EL FIX) */
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Alinea los botones a la derecha */
+    gap: 10px;
 
-  ion-icon {
-    color: #f0f0f0;
-    pointer-events: none; /* Deja que el click pase al div padre (.add-product) */
-  }
-}
+    button {
+        background-color: $primary-red;
+        color: $white;
+        border: 1px solid $color-dark;
+        border-radius: 5px;
+        width: 25px;
+        height: 25px;
+        padding: 0;
+        font-size: 1.2em;
+        line-height: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-.add-product:active {
-  transform: scale(0.95);
-}
-
-.add-product:hover {
-  background-color: $secondary-green;
+    .qty-number {
+        /* ESTAS LÍNEAS ARREGLAN LA VISIBILIDAD */
+        min-width: 30px;
+        text-align: center;
+        font-weight: 900;
+        font-size: 1.2em;
+        color: $color-dark; /* <-- ¡COLOR OSCURO FORZADO! */
+    }
 }

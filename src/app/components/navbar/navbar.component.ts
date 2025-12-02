@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss'],
-  standalone: false // <--- TIENE QUE SER FALSE
+  standalone: false 
 })
 export class NavbarComponent implements OnInit {
   currentRoute: string = '';
