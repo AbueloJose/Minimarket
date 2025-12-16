@@ -18,7 +18,7 @@ $font-family: "Inter", sans-serif;
 
 .background-image {
   // Si tienes una imagen de fondo específica, descomenta la línea de abajo
-  // @include cover-background("/assets/img/background-food-vector.svg");
+  @include cover-background("/assets/img/background-image.png");
   background-color: #f4f4f4; 
   position: fixed;
   top: 0;

@@ -17,7 +17,7 @@ $font-family: "Inter", sans-serif;
 }
 
 .background-image {
-  // @include cover-background("/assets/img/background-food-vector.svg");
+  @include cover-background("/assets/img/background-image.png");
   background-color: #f4f4f4; 
   position: fixed;
   top: 0;

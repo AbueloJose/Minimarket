@@ -25,9 +25,11 @@ p {
   background-repeat: no-repeat;
 }
 
+/* IMPORTANTE: Si usas un div extra para el fondo en el HTML,
+   le quitamos el color sólido para que no tape la imagen.
+*/
 .background-image {
-  // @include cover-background("/assets/img/background-food-vector.svg");
-  background-color: #f4f4f4;
+  background: transparent; 
   position: fixed;
   top: 0;
   left: 0;
@@ -36,10 +38,14 @@ p {
   z-index: 0;
 }
 
+/* AQUÍ ESTÁ EL CAMBIO PRINCIPAL 
+   Usamos la variable CSS de Ionic para poner el fondo
+*/
 ion-content {
   position: relative;
   z-index: 1;
-  --background: transparent;
+  /* Cargamos la imagen, sin repetir, centrada y cubriendo todo (cover) */
+  --background: url('/assets/img/background-image.png') no-repeat center center / cover;
   display: block;
   width: 100%;
 }
@@ -94,15 +100,25 @@ ion-content {
   overflow-wrap: break-word;
 }
 
+// --- SECCIÓN DE LA FOTO DE PERFIL ---
 .profile-photo-container {
   width: 40%;
   border: 3px solid $color-dark;
   border-radius: 40px;
   background-color: #d9d9d9;
-  background-size: cover;
-  background-position: center;
   position: relative;
   aspect-ratio: 1/1;
+  overflow: hidden; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    display: block;
+  }
 
   .edit-avatar-btn {
     position: absolute;
@@ -116,6 +132,7 @@ ion-content {
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 10;
 
     ion-icon {
       color: $white;
@@ -128,6 +145,7 @@ ion-content {
 h1 {
   margin: 0;
 }
+
 .profile-section-container h1,
 ion-input.name-input {
   max-width: 100%;
@@ -149,7 +167,7 @@ ion-input.name-input {
   padding: 25px;
   height: 30em !important;
   border-radius: 40px;
-  background-color: #e0e0e0;
+  background-color: #e0e0e0; /* Fondo gris para que se lean los inputs sobre la imagen */
   --keyboard-offset: 0px;
 
   @media (min-width: 1024px) {
@@ -320,18 +338,18 @@ ion-button.logout-btn::part(native) {
       }
     }
 
-    ion-button.edit-avatar-btn::part(native) {
-      padding: 3px !important;
-      margin: 0 auto;
-      background: $primary-red;
-      margin-top: 30px;
-      width: 50%;
-      color: #e4e4e4;
-      border: 3px solid $color-dark;
-      font-size: 20px;
-      font-family: $font-family;
-      font-weight: 700;
-      border-radius: 10px;
+    ion-button.close-modal-btn::part(native) {
+        padding: 3px !important;
+        margin: 0 auto;
+        background: $primary-red;
+        margin-top: 30px;
+        width: 50%;
+        color: #e4e4e4;
+        border: 3px solid $color-dark;
+        font-size: 20px;
+        font-family: $font-family;
+        font-weight: 700;
+        border-radius: 10px;
     }
   }
 

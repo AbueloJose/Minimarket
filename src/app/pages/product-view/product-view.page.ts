@@ -55,6 +55,8 @@ export class ProductViewPage implements OnInit {
   async checkFavoriteStatus() {
     const user = await this.supabase.getCurrentUser();
     if (!user) return;
+    
+    // Accedemos a la propiedad supabase pública o usamos un método si existiera
     const { data } = await this.supabase.supabase.from('favoritos').select('*')
       .eq('usuario_id', user.id).eq('producto_id', this.id).maybeSingle();
     this.isFavorite = !!data;
@@ -63,6 +65,7 @@ export class ProductViewPage implements OnInit {
   async checkCartStatus() {
     const user = await this.supabase.getCurrentUser();
     if (!user) return;
+
     const { data } = await this.supabase.supabase.from('carrito').select('*')
       .eq('usuario_id', user.id).eq('producto_id', this.id).maybeSingle();
     this.isInCart = !!data;
@@ -90,14 +93,17 @@ export class ProductViewPage implements OnInit {
       return;
     }
 
+    // Llamamos al servicio
     const accion = await this.supabase.toggleCart(user.id, this.id);
 
+    // CORRECCIÓN AQUÍ:
+    // El servicio devuelve 'added' o 'exists'.
     if (accion === 'added') {
       this.isInCart = true;
       this.mostrarToast('Agregado al carrito 🛒', 'success');
-    } else if (accion === 'removed') {
-      this.isInCart = false;
-      this.mostrarToast('Eliminado del carrito 🗑️', 'medium');
+    } else if (accion === 'exists') {
+      this.isInCart = true; // Sigue estando en el carrito
+      this.mostrarToast('Ya tienes este producto en el carrito 🛒', 'warning');
     } else {
       this.mostrarToast('Error al actualizar carrito', 'danger');
     }

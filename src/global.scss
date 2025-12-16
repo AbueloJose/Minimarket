@@ -1,14 +1,3 @@
-/*
- * App Global CSS
- * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
- */
-
 /* Core CSS required for Ionic components to work properly */
 @import "@ionic/angular/css/core.css";
 
@@ -25,13 +14,39 @@
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
+/* COMENTAMOS EL MODO OSCURO PARA QUE NO MOLESTE */
+/* @import "@ionic/angular/css/palettes/dark.system.css"; */
 
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import "@ionic/angular/css/palettes/dark.system.css";
+/* =========================================
+   FORZADO SEGURO DE TEXTO NEGRO
+   ========================================= */
+
+:root {
+  /* Fondo BLANCO absoluto */
+  --ion-background-color: #ffffff;
+  --ion-item-background: #ffffff;
+  
+  /* Texto NEGRO absoluto */
+  --ion-text-color: #000000;
+}
+
+/* Forzar fondo blanco en el cuerpo de la app */
+body {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* Forzar texto negro en elementos comunes */
+p, h1, h2, h3, h4, h5, h6, span, div, ion-label, ion-input, ion-textarea {
+  color: #000000;
+}
+
+/* Placeholder gris para que se note la diferencia */
+::placeholder {
+  color: #666666 !important;
+}
+
+/* EXCEPCIÓN: Botones (Para que no se pongan negros si son de color) */
+ion-button {
+  --color: inherit; 
+}

@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 })
 export class ProductCardComponent implements OnInit {
   
-  @Input() id!: string;
+  @Input() id!: string; // Recibe el ID (que es item.id_producto)
   @Input() name!: string;
   @Input() price!: number;
   @Input() imageUrl!: string;
@@ -19,7 +19,9 @@ export class ProductCardComponent implements OnInit {
   ngOnInit() {
   }
 
+  // Función llamada por el (click) en el HTML para navegar
   goToProductView() {
+    // Navega a la ruta: /product-view/ID_DEL_PRODUCTO
     this.router.navigate(['/product-view', this.id]);
   }
 }

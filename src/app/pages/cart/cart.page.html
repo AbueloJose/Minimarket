@@ -7,20 +7,22 @@
     
     <div class="logo-section-container">
       <div class="logo-container">
-        <img src="https://ionicframework.com/docs/img/demos/card-media.png" alt="Logo Carrito" style="border-radius: 50%;" />
+        <img src="/assets/img/cart-childrend-image.svg" alt="Logo Carrito" style="border-radius: 50%;" />
       </div>
       <p>EL CARRITO</p>
       <p>Aquí encontrarás todos los productos que agregaste!</p>
     </div>
 
     <div class="products-container" *ngIf="productos.length > 0; else emptyCart">
+      
       <app-product-card 
-        *ngFor="let producto of productos" 
-        [id]="producto.id" 
-        [name]="producto.nombre"
-        [price]="producto.precio" 
-        [imageUrl]="producto.imagen_url">
+        *ngFor="let item of productos" 
+        [id]="item.producto?.id" 
+        [name]="item.producto?.nombre"
+        [price]="item.producto?.precio" 
+        [imageUrl]="item.producto?.imagen_url">
       </app-product-card>
+      
     </div>
 
     <ng-template #emptyCart>

@@ -34,13 +34,15 @@ $font-family: "Inter", sans-serif;
   background-image: url($url);
   background-position: center;
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: contain; /* Cambiado a contain para que el logo no se corte */
 }
 
 // Estilos aplicados
 .background-image {
-  // @include cover-background("/assets/img/background-image.png");
-  background-color: #3e2723; // Color café respaldo
+  /* CORREGIDO: Ruta relativa correcta hacia la carpeta assets */
+  @include cover-background("../../../assets/img/background-image.svg");
+  
+  // background-color: #3e2723; // Color de respaldo
   @include fixed-fullscreen;
   z-index: -1;
 }
@@ -67,18 +69,19 @@ span {
 
 ion-label {
   --background: transparent;
-  color: $primary-yellow; // Cambié a amarillo para que se vea en fondo oscuro
+  color: $primary-yellow;
   font-family: $font-family;
   font-weight: normal;
 }
 
 .image-container {
-  // @include image-container("/assets/img/image-logo-without-bg.svg");
-  @include image-container("https://ionicframework.com/docs/img/demos/card-media.png"); // Placeholder
+  /* CORREGIDO: Ruta relativa al logo */
+  @include image-container("../../../assets/img/image-logo.svg");
+  
   width: 300px;
   margin-top: 2em;
   height: 300px;
-  border-radius: 50%; // Para que el placeholder se vea redondo
+  // border-radius: 50%; // Puedes quitar esto si tu logo es cuadrado
 }
 
 .main-container {
@@ -108,7 +111,7 @@ ion-input {
   width: 100%;
   font-size: 15px;
   color: #000;
-  background: white; // Fondo blanco para input
+  background: white;
   --padding-start: 20px;
   border: 2px solid #{$color-dark};
   border-radius: 10px;

@@ -1,60 +1,44 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertController, LoadingController, NavController } from '@ionic/angular';
-import { FormBuilder, Validators, ValidatorFn } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { SupabaseService } from '../../services/supabase.service';
+import { SupabaseService } from 'src/app/services/supabase.service';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.page.html',
   styleUrls: ['./profile.page.scss'],
-  standalone: false // <--- Modo Clásico
+  standalone: false
 })
 export class ProfilePage implements OnInit {
+  
   showAvatarModal = false;
-  pendingAvatarSelection = '';
-  initialAvatar = '';
   isEditing = false;
-  isDisabled = false;
   inputDisabled = true;
 
+  // Ruta con barra al inicio
+  defaultAvatar = '/assets/img/df_minimarket.svg';
+  selectedAvatar: string = this.defaultAvatar;
+  initialAvatar = ''; 
+
   avatarUrls: string[] = [
+    '/assets/img/df_minimarket.svg',
     'https://ionicframework.com/docs/img/demos/avatar.svg',
-    'https://via.placeholder.com/150/FF0000/FFFFFF?text=Chicken1',
-    'https://via.placeholder.com/150/00FF00/FFFFFF?text=Chicken2'
+    'https://cdn-icons-png.flaticon.com/512/4140/4140048.png',
+    'https://cdn-icons-png.flaticon.com/512/4140/4140047.png',
+    'https://cdn-icons-png.flaticon.com/512/4140/4140037.png',
+    'https://cdn-icons-png.flaticon.com/512/2922/2922510.png'
   ];
 
-  selectedAvatar: string = 'https://ionicframework.com/docs/img/demos/avatar.svg';
-
-  // VALIDADORES
-  nameValidator: ValidatorFn = (control) => {
-    const value = control.value || '';
-    const valid = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(value);
-    return valid ? null : { invalidName: true };
-  };
-
-  addressValidator: ValidatorFn = (control) => {
-    const value = control.value || '';
-    const valid = /^[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ\s]+$/.test(value);
-    return valid ? null : { invalidAddress: true };
-  };
-
-  phoneValidator: ValidatorFn = (control) => {
-    const value = control.value || '';
-    const valid = /^[0-9]+$/.test(value);
-    return valid ? null : { invalidPhone: true };
-  };
-
-  // FORMULARIO
+  // FORMULARIO SIMPLIFICADO (Sin validadores estrictos para evitar errores)
   credentials = this.fb.nonNullable.group({
-    name: ['', [Validators.required, this.nameValidator]],
-    lastname: [''], 
+    name: ['', [Validators.required]], 
     email: ['', [Validators.required, Validators.email]],
-    address: ['', [Validators.required, this.addressValidator]],
-    phone: ['', [Validators.required, this.phoneValidator]],
+    address: ['', [Validators.required]], 
+    phone: ['', [Validators.required]], 
   });
 
-  usuario: any = {};
+  usuario: any = null;
 
   constructor(
     private router: Router,
@@ -66,54 +50,66 @@ export class ProfilePage implements OnInit {
   ) {}
 
   async ngOnInit() {
-    // Intenta obtener usuario real
-    const user = await this.supabase.getCurrentUser();
-    
-    if (user) {
-      this.usuario = user;
-      const perfil = await this.supabase.getUserProfile(user.id);
-      if (perfil) {
-        this.usuario = { ...this.usuario, ...perfil };
-        if (perfil.avatar) this.selectedAvatar = perfil.avatar;
-      }
-    } else {
-      // DATOS FALSOS TEMPORALES (Para que veas el diseño)
-      console.log('Modo Invitado (Visualización)');
-      this.usuario = {
-        nombre: 'Invitado',
-        email: 'invitado@pollo.com',
-        direccion: 'Av. Siempre Viva 123',
-        telefono: '999999999'
-      };
+    await this.cargarUsuario();
+  }
+
+  async cargarUsuario() {
+    const localUser = localStorage.getItem('usuario');
+    if (localUser) {
+      this.usuario = JSON.parse(localUser);
+      this.initializeFormWithUserData();
     }
 
-    this.initializeFormWithUserData();
+    const userSupabase = await this.supabase.getCurrentUser();
+    if (userSupabase) {
+      const perfilData = await this.supabase.getUserProfile(userSupabase.id); 
+      
+      this.usuario = { 
+        ...this.usuario, 
+        id: userSupabase.id,
+        email: userSupabase.email,
+        ...perfilData 
+      };
+
+      localStorage.setItem('usuario', JSON.stringify(this.usuario));
+      this.initializeFormWithUserData();
+    } else if (!this.usuario) {
+      this.router.navigate(['/login']);
+    }
   }
 
   private initializeFormWithUserData() {
+    if (!this.usuario) return;
+
     this.credentials.patchValue({
-      name: this.usuario.nombre || 'Usuario',
-      lastname: this.usuario.apellido || '',
+      name: this.usuario.nombre || '',
       email: this.usuario.email || '',
       address: this.usuario.direccion || '',
       phone: this.usuario.telefono || '',
     });
+
+    if (this.usuario.avatar && this.usuario.avatar.trim() !== '') {
+      this.selectedAvatar = this.usuario.avatar;
+    } else {
+      this.selectedAvatar = this.defaultAvatar;
+    }
+
+    // --- NUEVO: AVISA AL MENÚ QUE ESTA ES LA FOTO ACTUAL ---
+    this.supabase.updateLocalAvatar(this.selectedAvatar);
   }
 
-  // --- LÓGICA DE AVATAR ---
   openAvatarSelector() { this.showAvatarModal = true; }
   closeAvatarSelector() { this.showAvatarModal = false; }
 
-  async confirmAvatarSelection(url: string) {
+  confirmAvatarSelection(url: string) {
     this.selectedAvatar = url;
     this.closeAvatarSelector();
   }
 
-  // --- LÓGICA DE EDICIÓN ---
   editProfile() {
     this.isEditing = true;
     this.initialAvatar = this.selectedAvatar;
-    this.inputDisabled = false; // Habilitar inputs
+    this.inputDisabled = false;
   }
 
   cancelEdit() {
@@ -124,21 +120,46 @@ export class ProfilePage implements OnInit {
   }
 
   async saveChangesEdit() {
-    const updated = this.credentials.getRawValue();
-    // Aquí iría la lógica de guardado real
-    console.log('Guardando cambios...', updated);
-    
-    // Simulación de guardado
-    this.usuario = { ...this.usuario, ...updated, nombre: updated.name };
-    this.isEditing = false;
-    this.inputDisabled = true;
-    
-    const alert = await this.alertController.create({
-      header: 'Éxito',
-      message: 'Perfil actualizado (Simulación)',
-      buttons: ['OK']
-    });
-    await alert.present();
+    if (this.credentials.invalid) {
+      // Si falla, mostramos alerta suave
+      this.presentAlert('Atención', 'No puedes dejar campos vacíos.');
+      return;
+    }
+
+    const loading = await this.loadingController.create({ message: 'Guardando...' });
+    await loading.present();
+
+    const rawData = this.credentials.getRawValue();
+
+    const dataToUpdate = {
+      nombre: rawData.name,
+      direccion: rawData.address,
+      telefono: rawData.phone,
+      avatar: this.selectedAvatar 
+    };
+
+    try {
+      const { error } = await this.supabase.updateUserProfile(this.usuario.id, dataToUpdate);
+
+      if (error) throw error;
+
+      this.usuario = { ...this.usuario, ...dataToUpdate };
+      localStorage.setItem('usuario', JSON.stringify(this.usuario));
+
+      // --- NUEVO: AVISA AL MENÚ QUE LA FOTO CAMBIÓ ---
+      this.supabase.updateLocalAvatar(this.selectedAvatar);
+
+      this.isEditing = false;
+      this.inputDisabled = true;
+      
+      await loading.dismiss();
+      this.presentAlert('Éxito', 'Perfil actualizado.');
+
+    } catch (error) {
+      await loading.dismiss();
+      console.error(error);
+      this.presentAlert('Error', 'No se pudo guardar en la base de datos.');
+    }
   }
 
   async logout() {
@@ -150,8 +171,12 @@ export class ProfilePage implements OnInit {
         { 
           text: 'Salir', 
           handler: async () => {
-            await this.supabase.signOut();
-            // Redirigir al login o home
+            await this.supabase.logout();
+            localStorage.removeItem('usuario');
+            
+            // Reseteamos el avatar al default al salir
+            this.supabase.updateLocalAvatar(this.defaultAvatar);
+            
             this.router.navigate(['/login']); 
           } 
         }
@@ -160,17 +185,29 @@ export class ProfilePage implements OnInit {
     await alert.present();
   }
 
-  // HELPERS INPUTS
+  // --- HELPERS VISUALES ---
   onlyCharacteres(event: any) {
-    const value = event.target.value;
-    event.target.value = value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');
+    const input = event.target as HTMLInputElement;
+    input.value = input.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');
   }
+
   onlyAlphanumeric(event: any) {
-    const value = event.target.value;
-    event.target.value = value.replace(/[^A-Za-z0-9ÁÉÍÓÚáéíóúÑñ\s]/g, '');
+    // Permite letras, números, puntos, hashtags, comas y guiones
+    const input = event.target as HTMLInputElement;
+    input.value = input.value.replace(/[^A-Za-z0-9ÁÉÍÓÚáéíóúÑñ\.\#\,\-\s]/g, '');
   }
+
   onlyNumbers(event: any) {
-    const value = event.target.value;
-    event.target.value = value.replace(/[^0-9]/g, '');
+    const input = event.target as HTMLInputElement;
+    input.value = input.value.replace(/[^0-9]/g, '');
+  }
+
+  async presentAlert(header: string, message: string) {
+    const alert = await this.alertController.create({
+      header,
+      message,
+      buttons: ['OK']
+    });
+    await alert.present();
   }
 }

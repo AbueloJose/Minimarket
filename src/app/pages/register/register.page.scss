@@ -31,8 +31,10 @@ $font-family: "Inter", sans-serif;
 }
 
 .background-image {
-  // @include cover-background("/assets/img/background-image.png");
-  background-color: #f4f4f4;
+  /* CORREGIDO: Ruta relativa correcta hacia la carpeta assets */
+  @include cover-background("../../../assets/img/background-image.png");
+  
+  // background-color: #f4f4f4; // Opcional: color de respaldo
   @include fixed-fullscreen;
   z-index: -1;
 }

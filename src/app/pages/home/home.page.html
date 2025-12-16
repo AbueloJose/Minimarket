@@ -6,19 +6,30 @@
     <app-header-profile></app-header-profile>
     
     <div class="carrousel-container">
-      <!-- Placeholder por si falta la imagen -->
-      <img src="/assets/img/banner-arenas.svg" onerror="this.src='https://ionicframework.com/docs/img/demos/card-media.png'" alt="Carrousel" class="carrousel-image">
+      <img src="/assets/img/banner-minimarket.svg" onerror="this.src='https://ionicframework.com/docs/img/demos/card-media.png'" alt="Carrousel" class="carrousel-image">
     </div>
 
     <div class="category-btn-container">
-      <button class="category-btn" [ngClass]="{'active': categorySelected === 'menu'}"
-        (click)="seleccionarCategoria('menu')">Alimentos</button>
-      <button class="category-btn" [ngClass]="{'active': categorySelected === 'bebidas'}"
-        (click)="seleccionarCategoria('bebidas')">Bebidas</button>
+      <button class="category-btn" 
+              [ngClass]="{'active': categorySelected === 'stock'}"
+              (click)="seleccionarCategoria('stock')">
+        En Stock
+      </button>
+
+      <button class="category-btn" 
+              [ngClass]="{'active': categorySelected === 'agotado'}"
+              (click)="seleccionarCategoria('agotado')">
+        Agotado
+      </button>
     </div>
 
     <div class="products-container">
-      <app-product-card *ngFor="let producto of productosFiltrados" 
+      <div *ngIf="productosFiltrados.length === 0" style="text-align: center; margin-top: 20px; color: grey; width: 200%;">
+        <p>No hay productos en esta sección.</p>
+      </div>
+
+      <app-product-card *ngFor="let producto of productosFiltrados"
+        [class.card-agotada]="!producto.disponible"
         [id]="producto.id" 
         [name]="producto.nombre"
         [price]="producto.precio" 

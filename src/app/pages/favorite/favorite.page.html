@@ -7,20 +7,22 @@
     
     <div class="logo-section-container">
       <div class="logo-container">
-        <img src="https://ionicframework.com/docs/img/demos/card-media.png" alt="Logo Favoritos" style="border-radius: 50%;" />
+        <img src="/assets/img/fancy-image.svg" alt="Logo Favoritos" style="border-radius: 50%;" />
       </div>
       <p>FAVORITOS</p>
       <p>Tu lista de deseos. ¡Añádelos al carrito cuando quieras!</p>
     </div>
 
     <div class="products-container" *ngIf="productosFiltrados && productosFiltrados.length > 0; else noFavorites">
+      
       <app-product-card 
         *ngFor="let item of productosFiltrados" 
-        [id]="item.id" 
-        [name]="item.nombre"
-        [price]="item.precio" 
-        [imageUrl]="item.imagen_url">
+        [id]="item.producto?.id" 
+        [name]="item.producto?.nombre"
+        [price]="item.producto?.precio" 
+        [imageUrl]="item.producto?.imagen_url">
       </app-product-card>
+      
     </div>
 
     <ng-template #noFavorites>

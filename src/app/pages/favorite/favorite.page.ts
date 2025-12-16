@@ -11,7 +11,7 @@ import { SupabaseService } from '../../services/supabase.service';
 export class FavoritePage implements OnInit {
   
   usuario: any = null;
-  productosFiltrados: any[] = [];
+  productosFiltrados: any[] = []; 
   loading: boolean = true;
 
   constructor(
@@ -31,8 +31,27 @@ export class FavoritePage implements OnInit {
     
     if (user) {
       this.usuario = user;
-      // Esto llena la variable que usa el HTML nuevo
-      this.productosFiltrados = await this.supabase.getFavoritos();
+      
+      const datosRaw = await this.supabase.getFavoritos();
+      
+      if (datosRaw && datosRaw.length > 0) {
+        // Aplicamos el mapeo (aplanamiento) de los datos:
+        this.productosFiltrados = datosRaw.map((item: any) => {
+            const producto = item.productos || {};
+            
+            return {
+                favorito_id: item.id, 
+                // Extraemos las propiedades del producto a nivel raíz
+                id_producto: producto.id, // <-- Propiedad clave para navegación
+                nombre: producto.nombre || 'Producto no disponible',
+                precio: producto.precio || 0,
+                imagen_url: producto.imagen_url || null,
+                ...item
+            };
+        });
+      } else {
+          this.productosFiltrados = [];
+      }
     } else {
       this.usuario = null;
       this.productosFiltrados = [];

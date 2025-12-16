@@ -12,7 +12,7 @@ export class HeaderProfileComponent implements OnInit {
   
   username: string = 'Usuario'; 
   @Input() introText: string = '¿Qué es lo que pediremos hoy?';
-  selectedAvatar: string = 'https://ionicframework.com/docs/img/demos/avatar.svg';
+  selectedAvatar: string = '/assets/img/df_minimarket.svg';
 
   @Output() notifyClick = new EventEmitter<void>();
 

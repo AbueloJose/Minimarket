@@ -30,13 +30,22 @@ export class CartPayPage implements OnInit {
   }
 
   async cargarCarrito() {
-    this.cartItems = await this.supabase.getCarrito();
+    // Obtenemos los datos tal cual vienen de Supabase (con la estructura anidada)
+    const datos = await this.supabase.getCarrito();
+    
+    if (datos) {
+      this.cartItems = datos;
+    } else {
+      this.cartItems = [];
+    }
+
     this.calcularTotalCart();
   }
 
   calcularTotalCart() {
     this.total = this.cartItems.reduce((acc, item) => {
-      const precio = item.precio || 0; 
+      // Validamos que exista 'producto' para evitar errores si se borró de la BD
+      const precio = item.producto?.precio || 0; 
       return acc + (precio * item.cantidad);
     }, 0);
   }
@@ -44,6 +53,7 @@ export class CartPayPage implements OnInit {
   async cambiarCantidad(item: any, cambio: number) {
     const nuevaCantidad = item.cantidad + cambio;
 
+    // CASO 1: La cantidad llega a 0 -> Preguntar si borrar
     if (nuevaCantidad <= 0) {
       const alert = await this.alertController.create({
         header: 'Eliminar producto',
@@ -53,10 +63,12 @@ export class CartPayPage implements OnInit {
           {
             text: 'Eliminar',
             handler: async () => {
-              const idABorrar = item.carrito_id; 
-              if(idABorrar) {
-                await this.supabase.deleteItemCarrito(idABorrar);
-                this.cartItems = this.cartItems.filter((i) => i.carrito_id !== idABorrar);
+              // item.id es el ID de la fila del carrito
+              if(item.id) {
+                await this.supabase.deleteItemCarrito(item.id);
+                
+                // Filtramos la lista localmente para que se actualice rápido
+                this.cartItems = this.cartItems.filter((i) => i.id !== item.id);
                 this.calcularTotalCart();
               }
             },
@@ -65,10 +77,14 @@ export class CartPayPage implements OnInit {
       });
       await alert.present();
       
-    } else if (nuevaCantidad <= 10) {
-      const idAActualizar = item.carrito_id;
-      if(idAActualizar) {
-        await this.supabase.updateCantidadCarrito(idAActualizar, nuevaCantidad);
+    } 
+    // CASO 2: Aumentar o disminuir cantidad (Máximo 10)
+    else if (nuevaCantidad <= 10) {
+      if(item.id) {
+        // Actualizamos en Supabase
+        await this.supabase.updateCantidadCarrito(item.id, nuevaCantidad);
+        
+        // Actualizamos localmente
         item.cantidad = nuevaCantidad;
         this.calcularTotalCart();
       }
@@ -84,7 +100,6 @@ export class CartPayPage implements OnInit {
         { 
           text: 'Sí, vaciar', 
           handler: async () => {
-            // CORRECCIÓN: Obtenemos ID de usuario
             const user = await this.supabase.getCurrentUser();
             if (user) {
               await this.supabase.vaciarCarrito(user.id);
@@ -99,6 +114,9 @@ export class CartPayPage implements OnInit {
   }
 
   irAPagar() {
+    // Validar que haya items antes de ir a pagar
+    if (this.cartItems.length === 0) return;
+
     this.router.navigate(['/pay-method'], {
       state: {
         total: this.total,

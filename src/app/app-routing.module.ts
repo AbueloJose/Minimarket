@@ -4,7 +4,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'app-start', // <--- CAMBIO CLAVE: Ahora inicia en la bienvenida
+    redirectTo: 'app-start', // O cambia a 'login' si prefieres
     pathMatch: 'full'
   },
   {
@@ -24,7 +24,7 @@ const routes: Routes = [
     loadChildren: () => import('./pages/home/home.module').then( m => m.HomePageModule)
   },
   {
-    path: 'product-view/:id', // <--- Importante: Recibe el ID del producto
+    path: 'product-view/:id',
     loadChildren: () => import('./pages/product-view/product-view.module').then( m => m.ProductViewPageModule)
   },
   {
@@ -54,6 +54,14 @@ const routes: Routes = [
   {
     path: 'profile',
     loadChildren: () => import('./pages/profile/profile.module').then( m => m.ProfilePageModule)
+  },
+  {
+    path: 'admin-dashboard',
+    loadChildren: () => import('./pages/admin-dashboard/admin-dashboard.module').then( m => m.AdminDashboardPageModule)
+  },
+  {
+    path: 'admin-add-product',
+    loadChildren: () => import('./pages/admin-add-product/admin-add-product.module').then( m => m.AdminAddProductPageModule)
   },
 ];
 

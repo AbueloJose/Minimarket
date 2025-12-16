@@ -37,7 +37,8 @@ $font-family: "Inter", sans-serif;
 }
 
 .background-brown-image {
-  background-color: #3e2723;
+  /* CORREGIDO: Usamos ../../../ para salir a la raíz src/ */
+  @include cover-background("../../../assets/img/background-image.svg");
   @include fixed-fullscreen;
   z-index: -1;
 }
@@ -49,7 +50,8 @@ ion-content {
 }
 
 .image-container {
-  @include image-container("https://ionicframework.com/docs/img/demos/card-media.png"); 
+  /* CORREGIDO: Usamos ../../../ para salir a la raíz src/ */
+  @include image-container("../../../assets/img/image-logo.svg"); 
   width: 312px;
   height: 312px;
   border-radius: 20px;

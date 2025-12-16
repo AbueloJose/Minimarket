@@ -1,14 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertController, LoadingController, NavController } from '@ionic/angular';
 import { FormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { SupabaseService } from '../../services/supabase.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
-  standalone: false // <--- Modo Clásico
+  standalone: false
 })
 export class LoginPage implements OnInit {
   
@@ -22,7 +21,6 @@ export class LoginPage implements OnInit {
     private supabase: SupabaseService,
     private loadingController: LoadingController,
     private alertController: AlertController,
-    private router: Router,
     private navCtrl: NavController
   ) {}
 
@@ -31,78 +29,89 @@ export class LoginPage implements OnInit {
   get correo() { return this.credentials.controls.correo; }
   get contrasena() { return this.credentials.controls.contrasena; }
 
-  goToRegister() {
-    this.router.navigate(['/register']);
-  }
-
   async login() {
+    // 1. Validar formulario
     if (this.credentials.invalid) {
-      return; // Si el formulario está mal, no hace nada
+      await this.mostrarAlerta('Formulario Incorrecto', 'Revisa que el correo tenga @ y la contraseña tenga 6 caracteres.');
+      this.credentials.markAllAsTouched();
+      return; 
     }
-
-    const loading = await this.loadingController.create({ message: 'Iniciando sesión...' });
-    await loading.present();
 
     const { correo, contrasena } = this.credentials.getRawValue();
 
-    // 1. Intentamos loguear con Supabase
-    const { data, error } = await this.supabase.signIn(correo, contrasena);
+    // 2. Mostrar Spinner
+    const loading = await this.loadingController.create({ 
+      message: 'Iniciando sesión...',
+      duration: 10000 
+    });
+    await loading.present();
 
-    await loading.dismiss();
+    try {
+      console.log('--- INTENTANDO LOGIN ---');
+      
+      // 3. Autenticación (Auth de Supabase)
+      const { data, error } = await this.supabase.signIn(correo, contrasena);
+      
+      if (error) {
+        throw new Error(error.message);
+      }
 
-    if (error) {
-      await this.showAlert('Fallo en login', 'Credenciales inválidas o error de conexión.');
-      console.error(error);
-      return;
-    }
+      if (data.user) {
+        console.log('Auth correcto. User ID:', data.user.id);
 
-    if (data.user) {
-      // 2. Login exitoso -> Vamos al Home
-      // Borramos el historial para que no pueda volver al login con "Atrás"
-      this.navCtrl.navigateRoot('/home');
+        // 4. Obtener el ROL desde la base de datos
+        // Usamos la función que ya agregaste a tu servicio
+        const rol = await this.supabase.getUserRole(data.user.id);
+        
+        await loading.dismiss(); // Quitamos el spinner
+
+        console.log('Rol obtenido de DB:', rol);
+
+        // 5. Redirección lógica (CORREGIDA CON TU RUTA REAL)
+        if (rol === 'admin') {
+          console.log('--> Redirigiendo a Panel ADMIN');
+          // ESTA ES LA CORRECCIÓN CLAVE:
+          this.navCtrl.navigateRoot('/admin-dashboard'); 
+        } else if (rol === 'cliente') {
+          console.log('--> Redirigiendo a HOME (Cliente)');
+          this.navCtrl.navigateRoot('/home');
+        } else {
+          // Si no tiene rol definido o hay error, lo mandamos al home por defecto
+          console.warn('Usuario sin rol definido, enviando a home.');
+          this.navCtrl.navigateRoot('/home');
+        }
+
+      } else {
+        throw new Error('No se recibieron datos del usuario.');
+      }
+
+    } catch (e: any) {
+      // 6. Manejo de errores
+      await loading.dismiss().catch(() => {});
+      console.error('ERROR LOGIN:', e);
+      
+      // Mensajes amigables para el usuario
+      let msg = e.message;
+      if (msg.includes('Invalid login credentials')) msg = 'Correo o contraseña incorrectos.';
+
+      await this.mostrarAlerta('Error de acceso', msg);
     }
   }
 
-  // Recuperar contraseña
   async forgotPassword() {
-    const alert = await this.alertController.create({
-      header: 'Restablecer Contraseña',
-      message: 'Ingresa tu correo para enviarte un enlace.',
-      inputs: [
-        { type: 'email', name: 'email', placeholder: 'ejemplo@correo.com' },
-      ],
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Enviar',
-          handler: async (result) => {
-            if(!result.email) return;
-            
-            const loading = await this.loadingController.create();
-            await loading.present();
-            
-            const { error } = await this.supabase.sendPasswordReset(result.email);
-            
-            await loading.dismiss();
+    await this.mostrarAlerta('Recuperar', 'Contacta al administrador para restablecer tu cuenta.');
+  }
 
-            if (error) {
-              await this.showAlert('Error', error.message);
-            } else {
-              await this.showAlert('¡Listo!', 'Revisa tu correo.');
-            }
-          },
-        },
-      ],
+  async mostrarAlerta(header: string, message: string) {
+    const alert = await this.alertController.create({
+      header,
+      message,
+      buttons: ['OK']
     });
     await alert.present();
   }
-
-  async showAlert(title: string, msg: string) {
-    const alert = await this.alertController.create({
-      header: title,
-      message: msg,
-      buttons: ['OK'],
-    });
-    await alert.present();
+  
+  goToRegister() {
+    this.navCtrl.navigateForward('/register');
   }
 }

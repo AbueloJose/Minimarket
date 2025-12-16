@@ -32,6 +32,11 @@
       </div>
     </div>
 
+    <div class="category-badge" *ngIf="producto.categoria">
+      <ion-icon name="pricetag"></ion-icon>
+      <span>{{ producto.categoria | uppercase }}</span>
+    </div>
+
     <div class="description-container">
       <p>{{ producto.descripcion || 'Sin descripción.' }}</p>
     </div>

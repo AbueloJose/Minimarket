@@ -1,245 +1,318 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { environment } from 'src/environments/environment';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SupabaseService {
+
+  // TUS CREDENCIALES
+  private supabaseUrl = 'https://bkhvnanudfehwsjlvapo.supabase.co';
+  private supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJraHZuYW51ZGZlaHdzamx2YXBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyODc1MjAsImV4cCI6MjA3OTg2MzUyMH0.nf0KuKrsJXioD-KnpK7bZ50jE8FT8n0nkmWR-FQXffM';
+  
   public supabase: SupabaseClient;
+  
+  // BehaviorSubject mantiene el último valor emitido. 
+  // Iniciamos en null (nadie logueado).
+  private _currentUser = new BehaviorSubject<any>(null);
+  private _avatarUrl = new BehaviorSubject<string>('');
 
   constructor() {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
+    console.log('>>> Inicializando Supabase Service (Modo Persistente)...');
+    
+    // CONFIGURACIÓN ROBUSTA
+    this.supabase = createClient(this.supabaseUrl, this.supabaseKey, {
+      auth: {
+        persistSession: false,       // Queremos mantener la sesión
+        autoRefreshToken: false,     // Renovar token automáticamente
+        detectSessionInUrl: false   // FALSE para Ionic/Capacitor para evitar conflictos de rutas
+      }
+    });
+
+    // 1. Intentar recuperar sesión guardada
+    this.loadUser();
+    
+    // 2. Escuchar cambios de estado (Login, Logout, etc.)
+    this.supabase.auth.onAuthStateChange((event, session) => {
+      console.log('🔄 Estado Auth:', event);
+      if (session?.user) {
+        this._currentUser.next(session.user);
+      } else {
+        this._currentUser.next(null);
+      }
+    });
+  }
+
+  /**
+   * Carga el usuario de la memoria local de forma segura
+   */
+  async loadUser() {
+    try {
+      const { data, error } = await this.supabase.auth.getSession();
+      
+      if (error) {
+        console.error('Error recuperando sesión (posible dato corrupto):', error);
+        // Si hay error, limpiamos para evitar bloqueos
+        this._currentUser.next(null);
+        return;
+      }
+
+      if (data.session?.user) {
+        console.log('✅ Usuario recuperado:', data.session.user.email);
+        this._currentUser.next(data.session.user);
+      } else {
+        console.log('ℹ️ No hay sesión activa.');
+        this._currentUser.next(null);
+      }
+    } catch (e) {
+      console.error('Excepción crítica en loadUser:', e);
+      this._currentUser.next(null);
+    }
   }
 
   // ==========================================
-  // 1. AUTENTICACIÓN
+  // AUTENTICACIÓN
   // ==========================================
 
   async signIn(email: string, password: string) {
-    return await this.supabase.auth.signInWithPassword({ email, password });
+    return this.supabase.auth.signInWithPassword({ email, password });
   }
 
-  async signUp(email: string, password: string, data: any) {
-    return await this.supabase.auth.signUp({
+  async signUp(email: string, password: string, dataUser: any) {
+    const { data, error } = await this.supabase.auth.signUp({
       email,
       password,
-      options: { data: data }
+      options: { data: dataUser }
     });
+    return { data, error };
   }
 
-  async sendPasswordReset(email: string) {
-    return await this.supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: 'http://localhost:8100/reset-password',
-    });
-  }
-
-  async signOut() {
+  async logout() {
     await this.supabase.auth.signOut();
+    this._currentUser.next(null);
+    // Limpieza extra por seguridad
+    localStorage.removeItem(`sb-${this.supabaseUrl}-auth-token`);
   }
 
   async getCurrentUser() {
+    // Primero devolvemos lo que ya tenemos en memoria (es instantáneo)
+    if (this._currentUser.value) {
+      return this._currentUser.value;
+    }
+    // Si no, preguntamos a la base
     const { data } = await this.supabase.auth.getUser();
     return data.user;
   }
 
-  // ==========================================
-  // 2. PERFIL DE USUARIO
-  // ==========================================
-
-  async getUserProfile(uid: string) {
+  /**
+   * Busca en la tabla 'usuarios' usando la columna 'id'
+   */
+  async getUserRole(userId: string) {
     const { data, error } = await this.supabase
       .from('usuarios')
-      .select('*')
-      .eq('id', uid)
+      .select('rol')
+      .eq('id', userId)
       .single();
-    if (error) return null;
-    return data;
+
+    if (error) {
+      console.error('Error obteniendo rol:', error);
+      return null;
+    }
+    return data?.rol;
   }
 
+  async isAdmin(userId: string): Promise<boolean> {
+    const { data } = await this.supabase
+      .from('usuarios')
+      .select('rol')
+      .eq('id', userId) 
+      .maybeSingle();
+    return data?.rol === 'admin';
+  }
+  
+  // Observables
+  get currentUser$() { return this._currentUser.asObservable(); }
+  get currentAvatar$() { return this._avatarUrl.asObservable(); }
+
   // ==========================================
-  // 3. PRODUCTOS Y GENERAL
+  // PRODUCTOS E IMÁGENES
   // ==========================================
 
-  async getDatos(tabla: string) {
-    const { data, error } = await this.supabase
-      .from(tabla)
-      .select('*');
-    if (error) {
-      console.error(`Error cargando ${tabla}:`, error);
-      return [];
-    }
+  async getProducts() {
+    const { data } = await this.supabase
+      .from('productos')
+      .select('*')
+      .order('created_at', { ascending: false });
     return data || [];
   }
 
   async getProductoById(id: string) {
-    const { data, error } = await this.supabase
+    const { data } = await this.supabase
       .from('productos')
       .select('*')
       .eq('id', id)
       .single();
+    return data;
+  }
 
-    if (error) {
-      console.error('Error buscando producto en Supabase:', error);
+  async createProduct(productData: any) {
+    return this.supabase.from('productos').insert(productData);
+  }
+
+  async updateProduct(id: string, campos: any) {
+    return this.supabase.from('productos').update(campos).eq('id', id);
+  }
+
+  async deleteProduct(id: string) {
+    return this.supabase.from('productos').delete().eq('id', id);
+  }
+
+  async subirImagen(file: File): Promise<string | null> {
+    try {
+      const fileName = `img_${Date.now()}_${file.name}`;
+      const { error } = await this.supabase.storage
+        .from('productos')
+        .upload(fileName, file);
+
+      if (error) {
+        console.error('Error subiendo imagen:', error);
+        return null;
+      }
+
+      const { data: publicUrlData } = this.supabase.storage
+        .from('productos')
+        .getPublicUrl(fileName);
+        
+      return publicUrlData.publicUrl;
+    } catch (e) {
+      console.error('Excepción en subirImagen:', e);
       return null;
     }
-    return data || null;
   }
 
   // ==========================================
-  // 4. CARRITO DE COMPRAS
+  // CARRITO
   // ==========================================
-  
+
   async getCarrito() {
-    const { data, error } = await this.supabase
-      .from('carrito')
-      .select(`
-        id,
-        cantidad,
-        producto:productos ( * ) 
-      `); 
+    const user = await this.getCurrentUser();
+    if (!user) return [];
 
-    if (error) {
-      console.error('Error cargando carrito:', error);
-      return [];
-    }
-    
-    return (data || []).map((item: any) => ({
-      ...item.producto, 
-      cantidad: item.cantidad,
-      carrito_id: item.id
-    }));
-  }
-
-  async agregarAlCarrito(usuario_id: string, producto_id: string) {
-    const { data: existentes } = await this.supabase
-      .from('carrito')
-      .select('*')
-      .eq('usuario_id', usuario_id)
-      .eq('producto_id', producto_id);
-
-    if (existentes && existentes.length > 0) {
-      const item = existentes[0];
-      const { error } = await this.supabase
-        .from('carrito')
-        .update({ cantidad: item.cantidad + 1 })
-        .eq('id', item.id);
-      return !error;
-    } else {
-      const { error } = await this.supabase
-        .from('carrito')
-        .insert({ usuario_id, producto_id, cantidad: 1 });
-      return !error;
-    }
-  }
-
-  async toggleCart(usuario_id: string, producto_id: string) {
     const { data } = await this.supabase
       .from('carrito')
-      .select('*')
-      .eq('usuario_id', usuario_id)
-      .eq('producto_id', producto_id)
-      .maybeSingle();
+      .select('*, producto:productos(*)')
+      .eq('usuario_id', user.id);
 
-    if (data) {
-      await this.supabase.from('carrito').delete().eq('id', data.id);
-      return 'removed'; 
-    } else {
-      await this.supabase.from('carrito').insert({ usuario_id, producto_id, cantidad: 1 });
-      return 'added'; 
-    }
-  }
-
-  async updateCantidadCarrito(id: string, cantidad: number) {
-    const { error } = await this.supabase
-      .from('carrito')
-      .update({ cantidad: cantidad })
-      .eq('id', id);
-    return !error;
-  }
-
-  async deleteItemCarrito(id: string) {
-    const { error } = await this.supabase
-      .from('carrito')
-      .delete()
-      .eq('id', id);
-    return !error;
-  }
-
-  async vaciarCarrito(usuario_id: string) {
-    const { error } = await this.supabase
-      .from('carrito')
-      .delete()
-      .eq('usuario_id', usuario_id); 
-    return !error;
-  }
-
-  // ==========================================
-  // 5. FAVORITOS
-  // ==========================================
-
-  async getFavoritos() {
-    const { data, error } = await this.supabase
-      .from('favoritos')
-      .select(`
-        id,
-        producto:productos ( * )
-      `);
-    if (error) return [];
-    return (data || []).map((item: any) => item.producto);
-  }
-
-  async toggleFavorite(usuario_id: string, producto_id: string) {
-    const { data } = await this.supabase
-      .from('favoritos')
-      .select('*')
-      .match({ usuario_id, producto_id })
-      .maybeSingle();
-
-    if (data) {
-      await this.supabase.from('favoritos').delete().eq('id', data.id);
-      return 'removed'; 
-    } else {
-      await this.supabase.from('favoritos').insert({ usuario_id, producto_id });
-      return 'added'; 
-    }
-  }
-
-  // ==========================================
-  // 6. PAGOS Y TARJETAS
-  // ==========================================
-
-  async getTarjetasUsuario(uid: string) {
-    const { data, error } = await this.supabase
-      .from('tarjetas')
-      .select('*')
-      .eq('usuario_id', uid);
-    if (error) return [];
     return data || [];
   }
 
+  async toggleCart(uid: string, pid: string) {
+    const { data: existing } = await this.supabase
+      .from('carrito')
+      .select('*')
+      .eq('usuario_id', uid)
+      .eq('producto_id', pid)
+      .maybeSingle();
+
+    if (existing) {
+      return 'exists'; 
+    } else {
+      await this.supabase.from('carrito').insert({ usuario_id: uid, producto_id: pid, cantidad: 1 });
+      return 'added';
+    }
+  }
+
+  async deleteItemCarrito(carritoId: string) {
+    return this.supabase.from('carrito').delete().eq('id', carritoId);
+  }
+
+  async updateCantidadCarrito(carritoId: string, cantidad: number) {
+    return this.supabase.from('carrito').update({ cantidad }).eq('id', carritoId);
+  }
+
+  async vaciarCarrito(uid: string) {
+    return this.supabase.from('carrito').delete().eq('usuario_id', uid);
+  }
+
   // ==========================================
-  // 7. PEDIDOS
+  // FAVORITOS
   // ==========================================
 
-  async crearPedido(datosPedido: any) {
+  async getFavoritos() {
+    const user = await this.getCurrentUser();
+    if (!user) return [];
+
+    const { data } = await this.supabase
+      .from('favoritos')
+      .select('*, producto:productos(*)')
+      .eq('usuario_id', user.id);
+    return data || [];
+  }
+
+  async toggleFavorite(uid: string, pid: string) {
+    const { data: existing } = await this.supabase
+      .from('favoritos')
+      .select('*')
+      .eq('usuario_id', uid)
+      .eq('producto_id', pid)
+      .maybeSingle();
+
+    if (existing) {
+      await this.supabase.from('favoritos').delete().eq('id', existing.id);
+      return 'removed';
+    } else {
+      await this.supabase.from('favoritos').insert({ usuario_id: uid, producto_id: pid });
+      return 'added';
+    }
+  }
+
+  // ==========================================
+  // PERFIL
+  // ==========================================
+
+  async getUserProfile(userId: string): Promise<any> {
+    const { data } = await this.supabase
+      .from('usuarios')
+      .select('*')
+      .eq('id', userId)
+      .maybeSingle();
+    return data || {};
+  }
+
+  async updateUserProfile(userId: string, data: any) {
+    return this.supabase.from('usuarios').update(data).eq('id', userId);
+  }
+
+  updateLocalAvatar(url: string) {
+    this._avatarUrl.next(url);
+  }
+
+  async getTarjetasUsuario(uid: string) {
+    return []; 
+  }
+
+  // ==========================================
+  // PEDIDOS
+  // ==========================================
+
+  async crearPedido(pedido: any) {
     const { data, error } = await this.supabase
       .from('pedidos')
-      .insert(datosPedido)
-      .select('id')
+      .insert(pedido)
+      .select()
       .single();
-    if (error) { console.error('Error pedido:', error); return null; }
+    
+    if (error) throw error;
     return data;
   }
 
   async guardarDetallePedido(detalle: any) {
-    const { error } = await this.supabase.from('detalle_pedidos').insert(detalle);
-    return !error;
+    return this.supabase.from('detalle_pedido').insert(detalle);
   }
-  
+
   async actualizarEstadoPedido(id: string, estado: string) {
-    const { error } = await this.supabase.from('pedidos').update({ estado: estado }).eq('id', id);
-    return !error;
+    return this.supabase.from('pedidos').update({ estado }).eq('id', id);
   }
 
   async getPedidoById(id: string) {
@@ -248,7 +321,29 @@ export class SupabaseService {
       .select('*')
       .eq('id', id)
       .single();
+
+    if (error) {
+      console.error('Error obteniendo pedido:', error);
+      return null;
+    }
+    return data;
+  }
+
+  async getUltimoPedido(userId: string) {
+    const { data, error } = await this.supabase
+      .from('pedidos')
+      .select('*')
+      .eq('usuario_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
     if (error) return null;
     return data;
+  }
+
+  async getDatos(tabla: string) {
+    const { data } = await this.supabase.from(tabla).select('*');
+    return data || [];
   }
 }

@@ -1,0 +1,71 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin-dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Agregar Producto</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <form (ngSubmit)="guardarProducto()">
+    <ion-list>
+      
+      <ion-item>
+        <ion-label position="stacked">Nombre del Producto</ion-label>
+        <ion-input [(ngModel)]="producto.nombre" name="nombre" type="text" required placeholder="Ej. Hamburguesa"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Precio (S/)</ion-label>
+        <ion-input [(ngModel)]="producto.precio" name="precio" type="number" required placeholder="0.00"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Categoría</ion-label>
+        <ion-select [(ngModel)]="producto.categoria" name="categoria" placeholder="Selecciona una opción">
+          <ion-select-option value="alimentos">Alimentos</ion-select-option>
+          <ion-select-option value="bebidas">Bebidas</ion-select-option>
+          <ion-select-option value="extras">Extras</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Descripción</ion-label>
+        <ion-textarea [(ngModel)]="producto.descripcion" name="descripcion" rows="3"></ion-textarea>
+      </ion-item>
+
+      <ion-item lines="none" class="ion-margin-top">
+        <ion-label>Imagen del Producto</ion-label>
+      </ion-item>
+
+      <div class="ion-padding-horizontal">
+        <input type="file" (change)="cargarImagen($event)" id="fileInput" style="display: none;" accept="image/*">
+        
+        <ion-button expand="block" color="secondary" onclick="document.getElementById('fileInput').click()">
+          <ion-icon slot="start" name="cloud-upload"></ion-icon>
+          Subir desde Dispositivo
+        </ion-button>
+      </div>
+
+      <ion-item>
+        <ion-label position="stacked">O pegar enlace (URL)</ion-label>
+        <ion-input [(ngModel)]="producto.imagen_url" name="imagen_url" type="url" placeholder="https://..."></ion-input>
+      </ion-item>
+
+      <div class="ion-padding ion-text-center" *ngIf="producto.imagen_url">
+        <img [src]="producto.imagen_url" style="max-height: 200px; border-radius: 10px; margin-top: 10px; border: 2px solid #ccc;" />
+      </div>
+
+    </ion-list>
+
+    <div class="ion-padding-top">
+      <ion-button expand="block" type="submit" color="primary">
+        Guardar Producto
+        <ion-icon slot="end" name="save"></ion-icon>
+      </ion-button>
+    </div>
+
+  </form>
+</ion-content>

@@ -14,8 +14,8 @@ $font-family: "Inter", sans-serif;
 }
 
 .background-image {
-  // @include cover-background("/assets/img/background-food-vector.svg");
-  background-color: #f4f4f4; // Fondo respaldo
+  @include cover-background("/assets/img/background-image.png");
+  background-color: #f4f4f4;
   position: fixed;
   top: 0;
   left: 0;
@@ -63,7 +63,7 @@ button:hover {
   padding: 3.3em 1.3em 0em 1.3em;
   box-sizing: border-box;
   overflow-y: auto;
-  padding-bottom: 100px; /* Espacio para el navbar */
+  padding-bottom: 100px;
 }
 
 .carrousel-container {
@@ -93,6 +93,7 @@ button:hover {
   gap: 15px;
   margin: 1.5em 0em;
 }
+
 .category-btn.active,
 .category-btn.active:hover {
   background-color: #8d2516;
@@ -124,4 +125,12 @@ button:hover {
   width: 100%;
   padding-bottom: 70px;
   box-sizing: border-box;
+}
+
+/* --- ESTILO PARA PRODUCTO AGOTADO --- */
+.card-agotada {
+  border: 3px solid $light-gray !important; /* Borde gris */
+  opacity: 0.6;          /* Se ve más transparente */
+  filter: grayscale(100%); /* Opcional: Blanco y negro */
+  pointer-events: none;  /* BLOQUEA CLICS: No se puede seleccionar nada */
 }
