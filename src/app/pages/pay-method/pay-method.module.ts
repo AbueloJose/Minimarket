@@ -5,7 +5,6 @@ import { IonicModule } from '@ionic/angular';
 import { PayMethodPageRoutingModule } from './pay-method-routing.module';
 import { PayMethodPage } from './pay-method.page';
 
-// Componentes
 import { ComponentsModule } from '../../components/components.module';
 
 @NgModule({

@@ -5,7 +5,6 @@ import { IonicModule } from '@ionic/angular';
 import { FavoritePageRoutingModule } from './favorite-routing.module';
 import { FavoritePage } from './favorite.page';
 
-// IMPORTAMOS TUS COMPONENTES
 import { ComponentsModule } from '../../components/components.module';
 
 @NgModule({
@@ -14,7 +13,7 @@ import { ComponentsModule } from '../../components/components.module';
     FormsModule,
     IonicModule,
     FavoritePageRoutingModule,
-    ComponentsModule // <--- Indispensable
+    ComponentsModule 
   ],
   declarations: [FavoritePage]
 })

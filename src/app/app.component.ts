@@ -23,14 +23,12 @@ export class AppComponent implements OnInit {
     { title: 'Mis Pedidos', url: '/pedidos', icon: 'list' },
   ];
 
-  // 2. MENÚ ADMIN (NUEVO SIDEBAR)
+  // 2. MENÚ ADMIN
   private adminPages = [
     { title: 'Gestionar Productos', url: '/admin-dashboard', icon: 'layers' },
     { title: 'Agregar Producto', url: '/admin-add-product', icon: 'add-circle' },
-    // Puedes agregar 'Ver Pedidos Clientes' aquí en el futuro
   ];
 
-  // La variable que usa el HTML
   public appPages = this.clientPages; 
   public labels = ['Familia', 'Amigos', 'Notas'];
 
@@ -38,7 +36,6 @@ export class AppComponent implements OnInit {
     private supabase: SupabaseService,
     private router: Router
   ) {
-    // Escuchar cambios de sesión para actualizar menú en tiempo real
     this.supabase.supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         await this.checkUserRole(session.user.id);
@@ -51,7 +48,6 @@ export class AppComponent implements OnInit {
   async ngOnInit() {
     this.supabase.currentAvatar$.subscribe(url => { if(url) this.menuAvatar = url; });
     
-    // Chequeo inicial
     const user = await this.supabase.getCurrentUser();
     if(user) {
       await this.checkUserRole(user.id);
@@ -89,6 +85,6 @@ export class AppComponent implements OnInit {
     this.usuarioEmail = '';
     this.menuAvatar = '/assets/img/df_minimarket.svg';
     this.esAdmin = false;
-    this.appPages = this.clientPages; // Vuelta al menú normal
+    this.appPages = this.clientPages; 
   }
 }

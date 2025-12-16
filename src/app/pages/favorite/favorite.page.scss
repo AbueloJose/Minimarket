@@ -1,7 +1,7 @@
 $primary-yellow: #fab222;
 $primary-green: #417533;
 $secondary-green: #3b6630;
-$primary-red: #8d2516; // Color del texto del título
+$primary-red: #8d2516; 
 $hover-yellow: #e4a21d;
 $color-dark: #120000;
 $white: #ffffff;
@@ -17,7 +17,6 @@ $font-family: "Inter", sans-serif;
 }
 
 .background-image {
-  // Si tienes una imagen de fondo específica, descomenta la línea de abajo
   @include cover-background("/assets/img/background-image.png");
   background-color: #f4f4f4; 
   position: fixed;
@@ -83,7 +82,7 @@ ion-content {
 .logo-section-container p:first-of-type {
   font-size: 35px;
   font-weight: 900;
-  color: $primary-red; /* Usando el rojo oscuro del diseño */
+  color: $primary-red; 
   font-family: $font-family;
   text-transform: uppercase;
 }
@@ -98,7 +97,7 @@ ion-content {
 
 .products-container {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Esto crea las dos columnas */
+  grid-template-columns: repeat(2, 1fr); 
   gap: 20px;
   background-color: transparent;
   border-radius: 40px;

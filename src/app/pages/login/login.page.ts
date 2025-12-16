@@ -30,7 +30,6 @@ export class LoginPage implements OnInit {
   get contrasena() { return this.credentials.controls.contrasena; }
 
   async login() {
-    // 1. Validar formulario
     if (this.credentials.invalid) {
       await this.mostrarAlerta('Formulario Incorrecto', 'Revisa que el correo tenga @ y la contraseña tenga 6 caracteres.');
       this.credentials.markAllAsTouched();
@@ -39,7 +38,6 @@ export class LoginPage implements OnInit {
 
     const { correo, contrasena } = this.credentials.getRawValue();
 
-    // 2. Mostrar Spinner
     const loading = await this.loadingController.create({ 
       message: 'Iniciando sesión...',
       duration: 10000 
@@ -49,7 +47,6 @@ export class LoginPage implements OnInit {
     try {
       console.log('--- INTENTANDO LOGIN ---');
       
-      // 3. Autenticación (Auth de Supabase)
       const { data, error } = await this.supabase.signIn(correo, contrasena);
       
       if (error) {
@@ -59,24 +56,19 @@ export class LoginPage implements OnInit {
       if (data.user) {
         console.log('Auth correcto. User ID:', data.user.id);
 
-        // 4. Obtener el ROL desde la base de datos
-        // Usamos la función que ya agregaste a tu servicio
         const rol = await this.supabase.getUserRole(data.user.id);
         
-        await loading.dismiss(); // Quitamos el spinner
+        await loading.dismiss(); 
 
         console.log('Rol obtenido de DB:', rol);
 
-        // 5. Redirección lógica (CORREGIDA CON TU RUTA REAL)
         if (rol === 'admin') {
           console.log('--> Redirigiendo a Panel ADMIN');
-          // ESTA ES LA CORRECCIÓN CLAVE:
           this.navCtrl.navigateRoot('/admin-dashboard'); 
         } else if (rol === 'cliente') {
           console.log('--> Redirigiendo a HOME (Cliente)');
           this.navCtrl.navigateRoot('/home');
         } else {
-          // Si no tiene rol definido o hay error, lo mandamos al home por defecto
           console.warn('Usuario sin rol definido, enviando a home.');
           this.navCtrl.navigateRoot('/home');
         }
@@ -86,11 +78,9 @@ export class LoginPage implements OnInit {
       }
 
     } catch (e: any) {
-      // 6. Manejo de errores
       await loading.dismiss().catch(() => {});
       console.error('ERROR LOGIN:', e);
       
-      // Mensajes amigables para el usuario
       let msg = e.message;
       if (msg.includes('Invalid login credentials')) msg = 'Correo o contraseña incorrectos.';
 

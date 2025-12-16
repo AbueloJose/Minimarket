@@ -13,6 +13,6 @@ import { AdminDashboardPage } from './admin-dashboard.page';
     IonicModule,
     AdminDashboardPageRoutingModule
   ],
-  declarations: [AdminDashboardPage] // Ahora funcionará porque standalone es false
+  declarations: [AdminDashboardPage] 
 })
 export class AdminDashboardPageModule {}

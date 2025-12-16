@@ -16,7 +16,6 @@ export class ProfilePage implements OnInit {
   isEditing = false;
   inputDisabled = true;
 
-  // Ruta con barra al inicio
   defaultAvatar = '/assets/img/df_minimarket.svg';
   selectedAvatar: string = this.defaultAvatar;
   initialAvatar = ''; 
@@ -30,7 +29,6 @@ export class ProfilePage implements OnInit {
     'https://cdn-icons-png.flaticon.com/512/2922/2922510.png'
   ];
 
-  // FORMULARIO SIMPLIFICADO (Sin validadores estrictos para evitar errores)
   credentials = this.fb.nonNullable.group({
     name: ['', [Validators.required]], 
     email: ['', [Validators.required, Validators.email]],
@@ -94,7 +92,6 @@ export class ProfilePage implements OnInit {
       this.selectedAvatar = this.defaultAvatar;
     }
 
-    // --- NUEVO: AVISA AL MENÚ QUE ESTA ES LA FOTO ACTUAL ---
     this.supabase.updateLocalAvatar(this.selectedAvatar);
   }
 
@@ -121,7 +118,6 @@ export class ProfilePage implements OnInit {
 
   async saveChangesEdit() {
     if (this.credentials.invalid) {
-      // Si falla, mostramos alerta suave
       this.presentAlert('Atención', 'No puedes dejar campos vacíos.');
       return;
     }
@@ -146,7 +142,6 @@ export class ProfilePage implements OnInit {
       this.usuario = { ...this.usuario, ...dataToUpdate };
       localStorage.setItem('usuario', JSON.stringify(this.usuario));
 
-      // --- NUEVO: AVISA AL MENÚ QUE LA FOTO CAMBIÓ ---
       this.supabase.updateLocalAvatar(this.selectedAvatar);
 
       this.isEditing = false;
@@ -174,7 +169,6 @@ export class ProfilePage implements OnInit {
             await this.supabase.logout();
             localStorage.removeItem('usuario');
             
-            // Reseteamos el avatar al default al salir
             this.supabase.updateLocalAvatar(this.defaultAvatar);
             
             this.router.navigate(['/login']); 
@@ -185,14 +179,12 @@ export class ProfilePage implements OnInit {
     await alert.present();
   }
 
-  // --- HELPERS VISUALES ---
   onlyCharacteres(event: any) {
     const input = event.target as HTMLInputElement;
     input.value = input.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');
   }
 
   onlyAlphanumeric(event: any) {
-    // Permite letras, números, puntos, hashtags, comas y guiones
     const input = event.target as HTMLInputElement;
     input.value = input.value.replace(/[^A-Za-z0-9ÁÉÍÓÚáéíóúÑñ\.\#\,\-\s]/g, '');
   }

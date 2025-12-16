@@ -1,6 +1,4 @@
-// src/app/pages/admin/admin-pedidos/admin-pedidos.page.ts
-
-import { Component } from '@angular/core'; // Quité OnInit porque usaremos ionViewWillEnter
+import { Component } from '@angular/core'; 
 import { MenuController } from '@ionic/angular';
 import { SupabaseService } from 'src/app/services/supabase.service';
 
@@ -10,7 +8,7 @@ import { SupabaseService } from 'src/app/services/supabase.service';
   styleUrls: ['./admin-pedidos.page.scss'],
   standalone: false
 })
-export class AdminPedidosPage { // Ya no hace falta implements OnInit obligatoriamente
+export class AdminPedidosPage { 
 
   pedidos: any[] = [];
 
@@ -19,7 +17,6 @@ export class AdminPedidosPage { // Ya no hace falta implements OnInit obligatori
     private menuCtrl: MenuController
   ) { }
 
-  // Se ejecuta SIEMPRE que entras a la pantalla (incluso si vienes de "Atrás")
   async ionViewWillEnter() {
     this.menuCtrl.enable(true);
     await this.cargarPedidos();

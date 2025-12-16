@@ -43,7 +43,6 @@ export class PedidoCargandoPage implements OnInit {
       return;
     }
 
-    // 1. Crear Pedido
     const nuevoPedido = {
       usuario_id: user.id,
       total: this.total,
@@ -59,7 +58,6 @@ export class PedidoCargandoPage implements OnInit {
       return;
     }
 
-    // 2. Guardar Detalles
     for (const item of this.cartItems) {
       const detalle = {
         pedido_id: pedidoCreado.id,
@@ -70,19 +68,16 @@ export class PedidoCargandoPage implements OnInit {
       await this.supabase.guardarDetallePedido(detalle);
     }
 
-    // 3. VACIAR CARRITO (Ahora pasamos el ID)
     await this.supabase.vaciarCarrito(user.id);
     this.cartItems = [];
     this.total = 0;
 
-    // 4. Guardar ID y Simular
     localStorage.setItem('pedidoActualId', pedidoCreado.id);
     this.simularEstados(pedidoCreado.id);
 
     setTimeout(() => {
       this.router.navigate(['/pedido-estado']);
     }, 2000);
-    // 5. BORRAR CARRITO
     console.log('Llamando a vaciarCarrito...');
     const borrado = await this.supabase.vaciarCarrito(user.id);
     

@@ -5,7 +5,6 @@ import { IonicModule } from '@ionic/angular';
 import { ProductViewPageRoutingModule } from './product-view-routing.module';
 import { ProductViewPage } from './product-view.page';
 
-// IMPORTAMOS TUS COMPONENTES (Header y Navbar)
 import { ComponentsModule } from '../../components/components.module';
 
 @NgModule({
@@ -14,7 +13,7 @@ import { ComponentsModule } from '../../components/components.module';
     FormsModule,
     IonicModule,
     ProductViewPageRoutingModule,
-    ComponentsModule // <--- SIN ESTO, NO SE VE LA NAVBAR
+    ComponentsModule 
   ],
   declarations: [ProductViewPage]
 })

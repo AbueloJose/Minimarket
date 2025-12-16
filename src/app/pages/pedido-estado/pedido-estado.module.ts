@@ -10,7 +10,7 @@ import { PedidoEstadoPage } from './pedido-estado.page';
   imports: [
     CommonModule,
     FormsModule,
-    IonicModule, // <--- ESTO ES LO QUE FALTABA
+    IonicModule,
     PedidoEstadoPageRoutingModule
   ],
   declarations: [PedidoEstadoPage]

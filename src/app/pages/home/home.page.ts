@@ -11,7 +11,6 @@ export class HomePage implements OnInit {
 
   usuario: any = { nombre: 'Invitado' };
   
-  // Por defecto mostramos lo que hay en stock
   categorySelected: string = 'stock'; 
   
   productos: any[] = [];
@@ -39,24 +38,21 @@ export class HomePage implements OnInit {
   }
 
   async cargarProductos() {
-    // IMPORTANTE: Traemos TODOS los productos (disponibles y no disponibles)
     const { data, error } = await this.supabase.supabase
       .from('productos')
       .select('*');
 
     if (data) {
       this.productos = data;
-      this.filtrarProductos(); // Filtramos según la selección actual
+      this.filtrarProductos(); 
     }
   }
 
   filtrarProductos() {
     if (this.categorySelected === 'stock') {
-      // Filtrar productos disponibles (disponible = true)
       this.productosFiltrados = this.productos.filter(p => p.disponible === true);
 
     } else if (this.categorySelected === 'agotado') {
-      // Filtrar productos agotados (disponible = false)
       this.productosFiltrados = this.productos.filter(p => p.disponible === false);
     } 
   }

@@ -37,7 +37,6 @@ $font-family: "Inter", sans-serif;
 }
 
 .background-brown-image {
-  /* CORREGIDO: Usamos ../../../ para salir a la raíz src/ */
   @include cover-background("../../../assets/img/background-image.svg");
   @include fixed-fullscreen;
   z-index: -1;
@@ -50,7 +49,6 @@ ion-content {
 }
 
 .image-container {
-  /* CORREGIDO: Usamos ../../../ para salir a la raíz src/ */
   @include image-container("../../../assets/img/image-logo.svg"); 
   width: 312px;
   height: 312px;

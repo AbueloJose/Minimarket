@@ -7,7 +7,6 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class SupabaseService {
 
-  // TUS CREDENCIALES
   private supabaseUrl = 'https://bkhvnanudfehwsjlvapo.supabase.co';
   private supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJraHZuYW51ZGZlaHdzamx2YXBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyODc1MjAsImV4cCI6MjA3OTg2MzUyMH0.nf0KuKrsJXioD-KnpK7bZ50jE8FT8n0nkmWR-FQXffM';
   
@@ -332,24 +331,15 @@ export class SupabaseService {
   }
 
   // ==========================================
-  // ZONA ADMIN (NUEVA FUNCIÓN AGREGADA)
+  // ZONA ADMIN
   // ==========================================
 
-  /**
-   * Obtiene todos los pedidos de la base de datos para el administrador.
-   * Incluye la relación con la tabla 'usuarios' para saber de quién es el pedido.
-   */
-// En src/app/services/supabase.service.ts
-
-// En src/app/services/supabase.service.ts
 
 async getAdminAllPedidos() {
-  // CAMBIO: Ordenamos por 'fecha', NO por 'created_at'
   const { data, error } = await this.supabase
     .from('pedidos')
     .select('*, usuario:usuarios(*)')
-    .order('fecha', { ascending: false }); // <--- AQUÍ ESTABA EL ERROR
-
+    .order('fecha', { ascending: false });
   if (error) {
     console.error('Error cargando pedidos admin:', error);
     return [];

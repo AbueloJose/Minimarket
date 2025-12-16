@@ -35,14 +35,12 @@ export class FavoritePage implements OnInit {
       const datosRaw = await this.supabase.getFavoritos();
       
       if (datosRaw && datosRaw.length > 0) {
-        // Aplicamos el mapeo (aplanamiento) de los datos:
         this.productosFiltrados = datosRaw.map((item: any) => {
             const producto = item.productos || {};
             
             return {
                 favorito_id: item.id, 
-                // Extraemos las propiedades del producto a nivel raíz
-                id_producto: producto.id, // <-- Propiedad clave para navegación
+                id_producto: producto.id, 
                 nombre: producto.nombre || 'Producto no disponible',
                 precio: producto.precio || 0,
                 imagen_url: producto.imagen_url || null,

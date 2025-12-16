@@ -31,10 +31,8 @@ $font-family: "Inter", sans-serif;
 }
 
 .background-image {
-  /* CORREGIDO: Ruta relativa correcta hacia la carpeta assets */
   @include cover-background("../../../assets/img/background-image.png");
   
-  // background-color: #f4f4f4; // Opcional: color de respaldo
   @include fixed-fullscreen;
   z-index: -1;
 }
@@ -87,7 +85,7 @@ ion-label {
   align-items: center;
   min-height: 100%;
   width: 100%;
-  padding: 3.5em 1em 6em; // Padding bottom extra para el navbar
+  padding: 3.5em 1em 6em; 
   box-sizing: border-box;
 }
 

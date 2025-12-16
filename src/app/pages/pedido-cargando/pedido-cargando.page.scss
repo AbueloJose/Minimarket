@@ -10,9 +10,7 @@ $text-dark: #151515;
 $font-family: "Inter", sans-serif;
 
 .cargando-content {
-  // Asegúrate de tener esta imagen o pon un color de fondo
-  // --background: url("/assets/img/background-red-static.svg") no-repeat center center fixed;
-  --background: #8d2516; // Color rojo de fondo por si falla la imagen
+  --background: #8d2516; 
   background-size: cover;
   display: flex;
   justify-content: center;
@@ -36,7 +34,7 @@ $font-family: "Inter", sans-serif;
   height: 150px;
   display: block;
   margin: 0 auto;
-  border-radius: 20px; /* Un poco de borde redondeado se ve bien */
+  border-radius: 20px; 
 }
 
 .text-container p {

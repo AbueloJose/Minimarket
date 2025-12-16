@@ -5,7 +5,6 @@ import { IonicModule } from '@ionic/angular';
 import { CartPayPageRoutingModule } from './cart-pay-routing.module';
 import { CartPayPage } from './cart-pay.page';
 
-// Componentes (por si usas alguno, aunque esta página tiene su propio diseño)
 import { ComponentsModule } from '../../components/components.module';
 
 @NgModule({

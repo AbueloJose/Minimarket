@@ -8,7 +8,7 @@ import { SupabaseService } from '../../services/supabase.service';
   selector: 'app-pay-method',
   templateUrl: './pay-method.page.html',
   styleUrls: ['./pay-method.page.scss'],
-  standalone: false // <--- Modo Clásico
+  standalone: false 
 })
 export class PayMethodPage implements OnInit {
   metodoSeleccionado: string | null = null;
@@ -26,7 +26,6 @@ export class PayMethodPage implements OnInit {
   ) {}
 
   async ngOnInit() {
-    // Recuperar datos pasados desde la pantalla anterior (Cart-Pay)
     const nav = this.router.getCurrentNavigation();
     const state = nav?.extras.state as { total: number; cartItems: any[] };
 
@@ -34,10 +33,9 @@ export class PayMethodPage implements OnInit {
       this.total = state.total;
       this.cartItems = state.cartItems || [];
     } else {
-      // Si entran directo sin datos, simular para pruebas o volver atrás
       // this.location.back();
       console.log('Modo prueba sin datos previos');
-      this.total = 150.00; // Simulación
+      this.total = 150.00; 
     }
 
     await this.cargarUsuario();
@@ -49,7 +47,6 @@ export class PayMethodPage implements OnInit {
   }
 
   async cargarUsuario() {
-    // Intentamos cargar usuario real o uno falso
     const user = await this.supabase.getCurrentUser();
     if (user) {
       this.usuario = await this.supabase.getUserProfile(user.id);
@@ -59,21 +56,17 @@ export class PayMethodPage implements OnInit {
   }
 
   async cargarTarjetas() {
-    // Si hay usuario, cargamos sus tarjetas
     const user = await this.supabase.getCurrentUser();
     if (user) {
       this.tarjetas = await this.supabase.getTarjetasUsuario(user.id);
     } else {
-      // Tarjeta simulada para que veas el diseño
       this.tarjetas = [
         { id: 'simulada_1', numero_mascara: '**** **** **** 4242' }
       ];
     }
   }
 
-  // --- MODAL DE TARJETA ---
   abrirModalAgregarTarjeta() {
-    // Aquí iría la carga de Stripe Elements
     this.showModal = true;
   }
 
@@ -82,7 +75,6 @@ export class PayMethodPage implements OnInit {
   }
 
   guardarTarjeta() {
-    // Simulación de guardar tarjeta
     alert('Función de Stripe pendiente de configurar. (Tarjeta guardada visualmente)');
     this.showModal = false;
   }
@@ -96,7 +88,6 @@ export class PayMethodPage implements OnInit {
         { 
           text: 'Sí', 
           handler: async () => {
-            // await this.supabase.deleteTarjeta(id);
             this.tarjetas = this.tarjetas.filter(t => t.id !== id);
           } 
         }
@@ -105,7 +96,6 @@ export class PayMethodPage implements OnInit {
     await alert.present();
   }
 
-  // --- PAGAR ---
   async realizarPedido() {
     if (!this.metodoSeleccionado) {
       const alert = await this.alertController.create({
@@ -117,11 +107,6 @@ export class PayMethodPage implements OnInit {
       return;
     }
 
-    // Aquí guardamos el pedido en Supabase
-    // const nuevoPedido = { ... }
-    // await this.supabase.crearPedido(nuevoPedido);
-
-    // Vamos a la pantalla de carga
     this.router.navigate(['/pedido-cargando'], {
       state: { total: this.total, cartItems: this.cartItems }
     });

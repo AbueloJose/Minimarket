@@ -22,7 +22,6 @@ export class AdminDashboardPage implements OnInit {
     await this.cargarProductos();
   }
 
-  // Se ejecuta cada vez que entras a la página (por si agregaste un producto y volviste)
   async ionViewWillEnter() {
     await this.cargarProductos();
   }

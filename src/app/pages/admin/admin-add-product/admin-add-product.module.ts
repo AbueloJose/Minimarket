@@ -13,6 +13,6 @@ import { AdminAddProductPage } from './admin-add-product.page';
     IonicModule,
     AdminAddProductPageRoutingModule
   ],
-  declarations: [AdminAddProductPage] // Ahora funcionará
+  declarations: [AdminAddProductPage] 
 })
 export class AdminAddProductPageModule {}

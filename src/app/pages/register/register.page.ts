@@ -4,7 +4,6 @@ import { FormBuilder, Validators, ValidatorFn, AbstractControl, ValidationErrors
 import { Router } from '@angular/router';
 import { SupabaseService } from '../../services/supabase.service';
 
-// --- TUS VALIDADORES PERSONALIZADOS ---
 function textOnlyValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const value = control.value;
@@ -44,7 +43,7 @@ function passwordMatchValidator(password: string, confirmPassword: string): Vali
   selector: 'app-register',
   templateUrl: './register.page.html',
   styleUrls: ['./register.page.scss'],
-  standalone: false // <--- Modo Clásico
+  standalone: false 
 })
 export class RegisterPage {
   
@@ -80,7 +79,6 @@ export class RegisterPage {
 
     const { email, password, name, lastname, address, phone } = this.credentials.getRawValue();
 
-    // Enviamos los datos extra como metadata del usuario
     const userData = {
       nombre: name,
       apellido: lastname,
@@ -110,7 +108,6 @@ export class RegisterPage {
     this.router.navigate(['/login']);
   }
 
-  // --- FILTROS DE INPUT (UX) ---
   filterTextOnly(event: any, controlName: string) {
     const input = event.target;
     const value = input.value;
@@ -142,7 +139,6 @@ export class RegisterPage {
   }
 
   filterPassword(event: any) {
-    // Solo limitamos longitud visualmente, el validador hace el resto
     const input = event.target;
     if (input.value.length > 50) input.value = input.value.substring(0, 50);
   }

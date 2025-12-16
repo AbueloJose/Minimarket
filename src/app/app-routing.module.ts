@@ -55,7 +55,7 @@ const routes: Routes = [
     path: 'profile',
     loadChildren: () => import('./pages/profile/profile.module').then( m => m.ProfilePageModule)
   },
-  // --- ZONA ADMIN (Dentro de la carpeta pages/admin) ---
+  // --- ZONA ADMIN ---
   {
     path: 'admin-dashboard',
     loadChildren: () => import('./pages/admin/admin-dashboard/admin-dashboard.module').then( m => m.AdminDashboardPageModule)
