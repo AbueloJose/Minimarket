@@ -1,0 +1,46 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin-dashboard" ></ion-back-button>
+    </ion-buttons>
+    <ion-title>Admin Pedidos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div *ngIf="pedidos.length === 0" class="ion-text-center" style="margin-top: 50px;">
+    <ion-icon name="receipt-outline" style="font-size: 60px; color: #ccc;"></ion-icon>
+    <h2 style="color: #666;">No hay pedidos aún.</h2>
+  </div>
+
+  <ion-card *ngFor="let p of pedidos">
+    <ion-card-header>
+      <ion-card-subtitle>
+  Fecha: {{ p.fecha | date:'short' }}
+</ion-card-subtitle>
+      <ion-card-title>
+        Cliente: {{ p.usuario?.email || 'Anónimo' }}
+      </ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <h2 style="color: var(--ion-color-primary); font-weight: bold; margin-bottom: 10px;">
+        Total: ${{ p.total }}
+      </h2>
+      
+      <ion-item lines="none" style="margin-top: 10px; border: 1px solid #ddd; border-radius: 8px;">
+        <ion-label position="stacked" color="medium">Estado actual</ion-label>
+        
+        <ion-select [value]="p.estado" (ionChange)="cambiarEstado(p, $event.detail.value)" interface="popover">
+          <ion-select-option value="Pendiente">Pendiente</ion-select-option>
+          <ion-select-option value="Preparando">Preparando</ion-select-option>
+          <ion-select-option value="En camino">En camino</ion-select-option>
+          <ion-select-option value="Entregado">Entregado</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

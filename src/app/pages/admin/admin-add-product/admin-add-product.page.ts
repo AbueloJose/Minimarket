@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastController, LoadingController } from '@ionic/angular';
-import { SupabaseService } from '../../services/supabase.service';
+import { SupabaseService } from '../../../services/supabase.service';
 
 @Component({
   selector: 'app-admin-add-product',
@@ -16,7 +16,7 @@ export class AdminAddProductPage implements OnInit {
     precio: null,
     categoria: '',
     descripcion: '',
-    imagen_url: '', // Esta se llenará sola cuando subamos la foto
+    imagen_url: '',
     disponible: true
   };
 
@@ -29,7 +29,6 @@ export class AdminAddProductPage implements OnInit {
 
   ngOnInit() { }
 
-  // --- NUEVA FUNCIÓN PARA SUBIR FOTO ---
   async cargarImagen(event: any) {
     const file = event.target.files[0];
     
@@ -41,13 +40,11 @@ export class AdminAddProductPage implements OnInit {
     });
     await loading.present();
 
-    // Llamamos al servicio
     const url = await this.supabase.subirImagen(file);
 
     loading.dismiss();
 
     if (url) {
-      // Si salió bien, asignamos la URL al producto automáticamente
       this.producto.imagen_url = url;
       this.mostrarToast('Imagen subida correctamente', 'success');
     } else {
@@ -55,7 +52,6 @@ export class AdminAddProductPage implements OnInit {
     }
   }
 
-  // --- FUNCIÓN DE GUARDAR (Igual que antes) ---
   async guardarProducto() {
     if (!this.producto.nombre || !this.producto.precio || !this.producto.categoria) {
       this.mostrarToast('Por favor completa nombre, precio y categoría', 'warning');

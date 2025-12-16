@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SupabaseService } from '../../services/supabase.service';
+import { SupabaseService } from '../../../services/supabase.service';
 import { AlertController, NavController } from '@ionic/angular';
 
 @Component({
@@ -22,6 +22,11 @@ export class AdminDashboardPage implements OnInit {
     await this.cargarProductos();
   }
 
+  // Se ejecuta cada vez que entras a la página (por si agregaste un producto y volviste)
+  async ionViewWillEnter() {
+    await this.cargarProductos();
+  }
+
   async cargarProductos() {
     this.productos = await this.supabase.getProducts();
   }
@@ -31,24 +36,21 @@ export class AdminDashboardPage implements OnInit {
     event.target.complete();
   }
 
-  // --- CORREGIDO: USAMOS 'disponible' EN LUGAR DE 'stock' ---
   async cambiarStock(producto: any, event: any) {
-    // Obtenemos el nuevo valor (true/false)
     const nuevoEstado = event.detail.checked;
     console.log(`Cambiando disponibilidad de ${producto.nombre} a:`, nuevoEstado);
 
     try {
-      // Usamos la columna real de tu base de datos: 'disponible'
       const { error } = await this.supabase.updateProduct(producto.id, { 
         disponible: nuevoEstado 
       });
 
       if (error) {
         console.error('Error al actualizar:', error);
-        event.target.checked = !nuevoEstado; // Revertir visualmente
+        event.target.checked = !nuevoEstado; 
         await this.mostrarAlerta('Error', 'No se pudo actualizar la disponibilidad.');
       } else {
-        producto.disponible = nuevoEstado; // Actualizar dato local
+        producto.disponible = nuevoEstado;
       }
 
     } catch (e) {

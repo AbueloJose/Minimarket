@@ -13,27 +13,22 @@ export class SupabaseService {
   
   public supabase: SupabaseClient;
   
-  // BehaviorSubject mantiene el último valor emitido. 
-  // Iniciamos en null (nadie logueado).
   private _currentUser = new BehaviorSubject<any>(null);
   private _avatarUrl = new BehaviorSubject<string>('');
 
   constructor() {
-    console.log('>>> Inicializando Supabase Service (Modo Persistente)...');
+    console.log('>>> Inicializando Supabase Service (Modo Sin Persistencia)...');
     
-    // CONFIGURACIÓN ROBUSTA
     this.supabase = createClient(this.supabaseUrl, this.supabaseKey, {
       auth: {
-        persistSession: false,       // Queremos mantener la sesión
-        autoRefreshToken: false,     // Renovar token automáticamente
-        detectSessionInUrl: false   // FALSE para Ionic/Capacitor para evitar conflictos de rutas
+        persistSession: false,       
+        autoRefreshToken: false,     
+        detectSessionInUrl: false   
       }
     });
 
-    // 1. Intentar recuperar sesión guardada
     this.loadUser();
     
-    // 2. Escuchar cambios de estado (Login, Logout, etc.)
     this.supabase.auth.onAuthStateChange((event, session) => {
       console.log('🔄 Estado Auth:', event);
       if (session?.user) {
@@ -44,16 +39,12 @@ export class SupabaseService {
     });
   }
 
-  /**
-   * Carga el usuario de la memoria local de forma segura
-   */
   async loadUser() {
     try {
       const { data, error } = await this.supabase.auth.getSession();
       
       if (error) {
         console.error('Error recuperando sesión (posible dato corrupto):', error);
-        // Si hay error, limpiamos para evitar bloqueos
         this._currentUser.next(null);
         return;
       }
@@ -91,23 +82,17 @@ export class SupabaseService {
   async logout() {
     await this.supabase.auth.signOut();
     this._currentUser.next(null);
-    // Limpieza extra por seguridad
     localStorage.removeItem(`sb-${this.supabaseUrl}-auth-token`);
   }
 
   async getCurrentUser() {
-    // Primero devolvemos lo que ya tenemos en memoria (es instantáneo)
     if (this._currentUser.value) {
       return this._currentUser.value;
     }
-    // Si no, preguntamos a la base
     const { data } = await this.supabase.auth.getUser();
     return data.user;
   }
 
-  /**
-   * Busca en la tabla 'usuarios' usando la columna 'id'
-   */
   async getUserRole(userId: string) {
     const { data, error } = await this.supabase
       .from('usuarios')
@@ -131,12 +116,11 @@ export class SupabaseService {
     return data?.rol === 'admin';
   }
   
-  // Observables
   get currentUser$() { return this._currentUser.asObservable(); }
   get currentAvatar$() { return this._avatarUrl.asObservable(); }
 
   // ==========================================
-  // PRODUCTOS E IMÁGENES
+  // PRODUCTOS
   // ==========================================
 
   async getProducts() {
@@ -268,7 +252,7 @@ export class SupabaseService {
   }
 
   // ==========================================
-  // PERFIL
+  // PERFIL DE USUARIO
   // ==========================================
 
   async getUserProfile(userId: string): Promise<any> {
@@ -346,4 +330,31 @@ export class SupabaseService {
     const { data } = await this.supabase.from(tabla).select('*');
     return data || [];
   }
+
+  // ==========================================
+  // ZONA ADMIN (NUEVA FUNCIÓN AGREGADA)
+  // ==========================================
+
+  /**
+   * Obtiene todos los pedidos de la base de datos para el administrador.
+   * Incluye la relación con la tabla 'usuarios' para saber de quién es el pedido.
+   */
+// En src/app/services/supabase.service.ts
+
+// En src/app/services/supabase.service.ts
+
+async getAdminAllPedidos() {
+  // CAMBIO: Ordenamos por 'fecha', NO por 'created_at'
+  const { data, error } = await this.supabase
+    .from('pedidos')
+    .select('*, usuario:usuarios(*)')
+    .order('fecha', { ascending: false }); // <--- AQUÍ ESTABA EL ERROR
+
+  if (error) {
+    console.error('Error cargando pedidos admin:', error);
+    return [];
+  }
+  return data;
+}
+
 }

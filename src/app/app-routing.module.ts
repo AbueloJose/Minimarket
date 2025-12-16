@@ -4,7 +4,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'app-start', // O cambia a 'login' si prefieres
+    redirectTo: 'app-start',
     pathMatch: 'full'
   },
   {
@@ -55,13 +55,18 @@ const routes: Routes = [
     path: 'profile',
     loadChildren: () => import('./pages/profile/profile.module').then( m => m.ProfilePageModule)
   },
+  // --- ZONA ADMIN (Dentro de la carpeta pages/admin) ---
   {
     path: 'admin-dashboard',
-    loadChildren: () => import('./pages/admin-dashboard/admin-dashboard.module').then( m => m.AdminDashboardPageModule)
+    loadChildren: () => import('./pages/admin/admin-dashboard/admin-dashboard.module').then( m => m.AdminDashboardPageModule)
   },
   {
     path: 'admin-add-product',
-    loadChildren: () => import('./pages/admin-add-product/admin-add-product.module').then( m => m.AdminAddProductPageModule)
+    loadChildren: () => import('./pages/admin/admin-add-product/admin-add-product.module').then( m => m.AdminAddProductPageModule)
+  },
+  {
+    path: 'admin-pedidos',
+    loadChildren: () => import('./pages/admin/admin-pedidos/admin-pedidos.module').then( m => m.AdminPedidosPageModule)
   },
 ];
 
